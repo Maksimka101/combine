@@ -1,7 +1,6 @@
 library combine;
 
-/// A Calculator.
-class Calculator {
-  /// Returns [value] plus 1.
-  int addOne(int value) => value + 1;
-}
+export 'src/combine_isolate/i_combine_isolate.dart';
+export 'src/combine_singleton.dart';
+export 'src/isolate_context.dart';
+export 'src/isolate_messenger/i_isolate_messenger.dart';
