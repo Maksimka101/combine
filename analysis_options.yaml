@@ -1,4 +1,93 @@
-include: package:flutter_lints/flutter.yaml
+include: package:all_lint_rules_community/all.yaml
 
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+analyzer:
+  exclude:
+    - "example/"
+  errors:
+    # Without ignore here, we cause import of all_lint_rules to warn, because some rules conflict.
+    # We explicitly enabled even conflicting rules and are fixing the conflicts in this file.
+    included_file_warning: ignore
+    # Treat missing required parameters as an error.
+    missing_required_param: error
+    # Treat missing returns as an error, not as a hint or a warning.
+    missing_return: error
+    # Allow having TODOs in the code.
+    todo: ignore
+
+linter:
+  rules:
+    # Custom enabled rules
+    avoid_types_on_closure_parameters: true
+    omit_local_variable_types: true
+    always_declare_return_types: true
+    # Custom disabled rules
+    avoid_implementing_value_types: false
+    always_put_required_named_parameters_first: false
+    prefer_double_quotes: false
+    unnecessary_final: false
+    public_member_api_docs: false
+    avoid_catches_without_on_clauses: false
+    always_specify_types: false
+    prefer_final_parameters: false
+    sort_pub_dependencies: false
+    library_private_types_in_public_api: false
+    diagnostic_describe_all_properties: false
+    hash_and_equals: false
+    cascade_invocations: false
+    lines_longer_than_80_chars: false
+    prefer_relative_imports: false
+    prefer_mixin: false
+    unnecessary_raw_strings: false
+    type_annotate_public_api: false
+    always_use_package_import: false
+    prefer_expression_function_bodies: false
+    no_default_cases: false
+    prefer_single_quotes: false
+    only_throw_errors: false
+    always_use_package_imports: false
+    avoid_dynamic_calls: false
+    type_annotate_public_apis: false
+    use_if_null_to_convert_nulls_to_bools: false
+    use_setters_to_change_properties: false
+    avoid_catching_errors: false
+    comment_references: false
+    one_member_abstracts: false
+    avoid_private_typedef_functions: false
+
+dart_code_metrics:
+  anti-patterns:
+    - long-method
+    - long-parameter-list
+  metrics:
+    cyclomatic-complexity: 20
+    maximum-nesting-level: 5
+    number-of-parameters: 4
+  metrics-exclude:
+    - test/**
+    - test_driver/**
+    - integration_test/**
+  rules:
+    - avoid-unused-parameters
+    - member-ordering:
+        order:
+          - constructors
+          - public-fields
+          - private-fields
+          - public-getters
+          - public-setters
+          - private-getters
+          - private-setters
+          - public-methods
+          - private-methods
+    - newline-before-return
+    - no-equal-arguments
+    - no-empty-block:
+        exclude:
+          - test/**
+    - no-equal-then-else
+    - no-magic-number:
+        exclude:
+          - test/**
+    - prefer-match-file-name:
+        exclude:
+          - test/**
