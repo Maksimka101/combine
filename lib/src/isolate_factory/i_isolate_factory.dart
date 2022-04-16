@@ -5,5 +5,6 @@ abstract class IIsolateFactory {
     IsolateEntryPoint entryPoint,
     Map<String, Object?> arguments, {
     String? debugName,
+    bool errorsAreFatal = true,
   });
 }

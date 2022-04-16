@@ -12,6 +12,7 @@ class IOIsolateFactory extends IIsolateFactory {
     IsolateEntryPoint entryPoint,
     Map<String, Object?> arguments, {
     String? debugName,
+    bool errorsAreFatal = true,
   }) async {
     final receivePort = ReceivePort();
     final isolate = await Isolate.spawn<_IsolateSetup>(
