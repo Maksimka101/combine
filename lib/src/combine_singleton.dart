@@ -11,19 +11,21 @@ class Combine {
 
   static Combine? _instance;
 
-  Future<ICombineIsolate> spawn(
-    IsolateEntryPoint entryPoint, {
-    Map<String, Object?> arguments = const {},
+  Future<ICombineIsolate> spawn<T>(
+    IsolateEntryPoint<T> entryPoint, {
+    Map<String, Object?> argumentsMap = const {},
+    T? argument,
     bool errorsAreFatal = true,
     String? debugName = "combine_isolate",
   }) async {
     return IOIsolateFactory().create(
       entryPoint,
-      arguments,
+      argumentsMap: argumentsMap,
+      argument: argument,
       debugName: debugName,
       errorsAreFatal: errorsAreFatal,
     );
   }
 }
 
-typedef IsolateEntryPoint = void Function(IsolateContext context);
+typedef IsolateEntryPoint<T> = void Function(IsolateContext context);

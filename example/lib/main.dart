@@ -63,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _createAssetsIsolate() async {
-    final isolate = await Combine().spawn(
+    final isolate = await Combine().spawn<String>(
       (context) {
         final messenger = context.isolateMessenger;
 
@@ -80,6 +80,8 @@ class _MyHomePageState extends State<MyHomePage> {
         });
       },
       debugName: "assets",
+      argument: "initial asset",
+      argumentsMap: {"initial": "asset"},
     );
 
     _assetsIsolate = isolate;

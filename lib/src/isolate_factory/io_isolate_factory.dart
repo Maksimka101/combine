@@ -12,19 +12,21 @@ import 'package:flutter/services.dart';
 
 class IOIsolateFactory extends IIsolateFactory {
   @override
-  Future<ICombineIsolate> create(
-    IsolateEntryPoint entryPoint,
-    Map<String, Object?> arguments, {
+  Future<ICombineIsolate> create<T>(
+    IsolateEntryPoint<T> entryPoint, {
+    Map<String, Object?>? argumentsMap,
+    T? argument,
     String? debugName,
     bool errorsAreFatal = true,
   }) async {
     final receivePort = ReceivePort();
-    final isolate = await Isolate.spawn<_IsolateSetup>(
-      _runInIsolate,
-      _IsolateSetup(
+    final isolate = await Isolate.spawn<_IsolateSetup<T>>(
+      _runInIsolate<T>,
+      _IsolateSetup<T>(
         receivePort.sendPort,
         entryPoint,
-        arguments,
+        argumentsMap,
+        argument,
       ),
       debugName: debugName,
       errorsAreFatal: errorsAreFatal,
@@ -45,7 +47,7 @@ class IOIsolateFactory extends IIsolateFactory {
     return IOCombineIsolate(isolate, isolateMessenger.toIsolateMessenger());
   }
 
-  static void _runInIsolate(_IsolateSetup setup) {
+  static void _runInIsolate<T>(_IsolateSetup<T> setup) {
     final receivePort = ReceivePort();
     final isolateMessenger = IOInternalIsolateMessenger(
       setup.sendPort,
@@ -54,7 +56,8 @@ class IOIsolateFactory extends IIsolateFactory {
     isolateMessenger.send(receivePort.sendPort);
 
     final isolateContext = IsolateContext(
-      arguments: setup.arguments,
+      argumentsMap: setup.argumentsMap ?? {},
+      argument: setup.argument,
       isolateMessenger: isolateMessenger.toIsolateMessenger(),
     );
 
@@ -64,14 +67,16 @@ class IOIsolateFactory extends IIsolateFactory {
   }
 }
 
-class _IsolateSetup {
+class _IsolateSetup<T> {
   _IsolateSetup(
     this.sendPort,
     this.entryPoint,
-    this.arguments,
+    this.argumentsMap,
+    this.argument,
   );
 
   final SendPort sendPort;
-  final IsolateEntryPoint entryPoint;
-  final Map<String, Object?> arguments;
+  final IsolateEntryPoint<T> entryPoint;
+  final Map<String, Object?>? argumentsMap;
+  final T? argument;
 }
