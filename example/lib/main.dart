@@ -1,5 +1,6 @@
 import 'package:combine/combine.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,29 +27,68 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   var _counter = 0;
-  ICombineIsolate? _combineIsolate;
+  var _loadedAssetString = "No assets loaded";
+  ICombineIsolate? _counterIsolate;
+  ICombineIsolate? _assetsIsolate;
 
   @override
   void initState() {
     super.initState();
+    _createCounterIsolate();
+    _createAssetsIsolate();
+  }
 
-    Combine().spawn((context) {
-      final messenger = context.isolateMessenger;
-      var counter = 0;
-      messenger.messagesStream.listen((event) {
-        if (event == "increment") {
-          messenger.send(++counter);
-        }
-      });
-    }).then((isolate) {
-      _combineIsolate = isolate;
-      setState(() {});
-      isolate.isolateMessenger.messagesStream.listen((event) {
-        if (event is int) {
-          _counter = event;
-          setState(() {});
-        }
-      });
+  Future<void> _createCounterIsolate() async {
+    final isolate = await Combine().spawn(
+      (context) {
+        final messenger = context.isolateMessenger;
+        var counter = 0;
+        messenger.messagesStream.listen((event) {
+          if (event == "increment") {
+            messenger.send(++counter);
+          }
+        });
+      },
+      debugName: "counter",
+    );
+
+    _counterIsolate = isolate;
+    setState(() {});
+    isolate.messenger.messagesStream.listen((event) {
+      if (event is int) {
+        _counter = event;
+        setState(() {});
+      }
+    });
+  }
+
+  Future<void> _createAssetsIsolate() async {
+    final isolate = await Combine().spawn(
+      (context) {
+        final messenger = context.isolateMessenger;
+
+        messenger.messagesStream.listen((event) async {
+          if (event is String) {
+            try {
+              final assetString = await rootBundle.loadString(event);
+              messenger.send(assetString);
+            } catch (e) {
+              messenger.send("Failed to load asset\nError: $e");
+              debugPrint(e.toString());
+            }
+          }
+        });
+      },
+      debugName: "assets",
+    );
+
+    _assetsIsolate = isolate;
+    setState(() {});
+    isolate.messenger.messagesStream.listen((event) {
+      if (event is String) {
+        _loadedAssetString = event;
+        setState(() {});
+      }
     });
   }
 
@@ -60,22 +100,32 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: ListView(
         children: [
-          if (_combineIsolate == null)
+          if (_counterIsolate == null || _assetsIsolate == null)
             const Text("Isolate is creating")
-          else
+          else ...[
             ListTile(
               title: Text("Counter: $_counter"),
               trailing: IconButton(
                 onPressed: _onIncrementCounter,
                 icon: const Icon(Icons.add),
               ),
-            )
+            ),
+            ListTile(
+              title: const Text("Loaded asset:"),
+              subtitle: Text(_loadedAssetString),
+              onTap: _onLoadAsset,
+            ),
+          ]
         ],
       ),
     );
   }
 
   void _onIncrementCounter() {
-    _combineIsolate?.isolateMessenger.send("increment");
+    _counterIsolate?.messenger.send("increment");
+  }
+
+  void _onLoadAsset() {
+    _assetsIsolate?.messenger.send("assets/test.txt");
   }
 }

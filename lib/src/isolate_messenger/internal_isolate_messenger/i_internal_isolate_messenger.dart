@@ -1,5 +1,5 @@
-abstract class IIsolateMessenger {
-  const IIsolateMessenger();
+abstract class IInternalIsolateMessenger {
+  const IInternalIsolateMessenger();
 
   /// Stream with messages from isolate.
   Stream<Object?> get messagesStream;

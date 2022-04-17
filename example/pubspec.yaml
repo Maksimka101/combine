@@ -23,4 +23,7 @@ dev_dependencies:
   flutter_lints: ^1.0.0
 
 flutter:
+  assets:
+    - assets/test.txt
+
   uses-material-design: true
