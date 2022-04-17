@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:combine/src/isolate_events.dart';
-import 'package:combine/src/isolate_messenger/internal_isolate_messenger/i_internal_isolate_messenger.dart';
+import 'package:combine/src/isolate_messenger/internal_isolate_messenger/internal_isolate_messenger.dart';
 import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 
@@ -16,7 +16,7 @@ class IsolatedMethodChannelMiddleware extends BinaryMessenger {
   /// Last created and [initialize]d middleware.
   static IsolatedMethodChannelMiddleware? instance;
 
-  final IInternalIsolateMessenger _isolateMessenger;
+  final InternalIsolateMessenger _isolateMessenger;
   late BinaryMessenger _binaryMessenger;
   final IdGenerator _generateId;
   final _platformResponsesCompleter = <String, Completer<ByteData?>>{};

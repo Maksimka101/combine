@@ -12,7 +12,7 @@ class IsolateContext extends Equatable {
 
   final Object? argument;
 
-  final IIsolateMessenger isolateMessenger;
+  final IsolateMessenger isolateMessenger;
 
   @override
   List<Object?> get props => [argumentsMap, argument, isolateMessenger];

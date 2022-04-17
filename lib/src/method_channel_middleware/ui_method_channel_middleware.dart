@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:combine/src/isolate_events.dart';
-import 'package:combine/src/isolate_messenger/internal_isolate_messenger/i_internal_isolate_messenger.dart';
+import 'package:combine/src/isolate_messenger/internal_isolate_messenger/internal_isolate_messenger.dart';
 import 'package:combine/src/method_channel_middleware/isolated_method_channel_middleware.dart';
 import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
@@ -21,7 +21,7 @@ class UIMethodChannelMiddleware {
   final BinaryMessenger _binaryMessenger;
   final Set<String> _methodChannels;
   final IdGenerator _idGenerator;
-  final IInternalIsolateMessenger _isolateMessenger;
+  final InternalIsolateMessenger _isolateMessenger;
   final _messageHandlersCompleter = <String, Completer<ByteData>>{};
   StreamSubscription<IsolateEvent>? _methodChannelEventsSubscription;
 

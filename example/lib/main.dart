@@ -28,8 +28,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   var _counter = 0;
   var _loadedAssetString = "No assets loaded";
-  ICombineIsolate? _counterIsolate;
-  ICombineIsolate? _assetsIsolate;
+  CombineIsolate? _counterIsolate;
+  CombineIsolate? _assetsIsolate;
 
   @override
   void initState() {
@@ -129,5 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _onLoadAsset() {
     _assetsIsolate?.messenger.send("assets/test.txt");
+    _loadedAssetString = "Loading in progress";
+    setState(() {});
   }
 }

@@ -2,17 +2,17 @@ import 'dart:async';
 import 'dart:isolate';
 
 import 'package:combine/combine.dart';
-import 'package:combine/src/bindings/isolate_binding.dart';
-import 'package:combine/src/combine_isolate/io_combine_isolate.dart';
-import 'package:combine/src/isolate_factory/i_isolate_factory.dart';
-import 'package:combine/src/isolate_messenger/internal_isolate_messenger/io_internal_isolate_messenger.dart';
+import 'package:combine/src/bindings/isolate_bindings/isolate_binding.dart';
+import 'package:combine/src/combine_isolate/native_combine_isolate.dart';
+import 'package:combine/src/isolate_factory/isolate_factory.dart';
+import 'package:combine/src/isolate_messenger/internal_isolate_messenger/native_internal_isolate_messenger.dart';
 import 'package:combine/src/method_channel_middleware/isolated_method_channel_middleware.dart';
 import 'package:combine/src/method_channel_middleware/ui_method_channel_middleware.dart';
 import 'package:flutter/services.dart';
 
-class IOIsolateFactory extends IIsolateFactory {
+class IsolateFactoryImpl extends IsolateFactory {
   @override
-  Future<ICombineIsolate> create<T>(
+  Future<CombineIsolate> create<T>(
     IsolateEntryPoint<T> entryPoint, {
     Map<String, Object?>? argumentsMap,
     T? argument,
@@ -30,12 +30,13 @@ class IOIsolateFactory extends IIsolateFactory {
       ),
       debugName: debugName,
       errorsAreFatal: errorsAreFatal,
+      paused: false,
     );
 
     final receivePortStream = receivePort.asBroadcastStream().cast<Object>();
     final sendPort = await receivePortStream.first as SendPort;
 
-    final isolateMessenger = IOInternalIsolateMessenger(
+    final isolateMessenger = NativeInternalIsolateMessenger(
       sendPort,
       receivePortStream,
     );
@@ -44,12 +45,12 @@ class IOIsolateFactory extends IIsolateFactory {
       ServicesBinding.instance!.defaultBinaryMessenger,
       isolateMessenger,
     ).initialize();
-    return IOCombineIsolate(isolate, isolateMessenger.toIsolateMessenger());
+    return NativeCombineIsolate(isolate, isolateMessenger.toIsolateMessenger());
   }
 
   static void _runInIsolate<T>(_IsolateSetup<T> setup) {
     final receivePort = ReceivePort();
-    final isolateMessenger = IOInternalIsolateMessenger(
+    final isolateMessenger = NativeInternalIsolateMessenger(
       setup.sendPort,
       receivePort.asBroadcastStream().cast<Object>(),
     );

@@ -21,6 +21,7 @@ linter:
     omit_local_variable_types: true
     always_declare_return_types: true
     # Custom disabled rules
+    unnecessary_late: false
     avoid_implementing_value_types: false
     always_put_required_named_parameters_first: false
     prefer_double_quotes: false
