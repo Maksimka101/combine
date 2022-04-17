@@ -57,9 +57,8 @@ class IsolateFactoryImpl extends IsolateFactory {
     isolateMessenger.send(receivePort.sendPort);
 
     final isolateContext = IsolateContext(
-      argumentsMap: setup.argumentsMap ?? {},
       argument: setup.argument,
-      isolateMessenger: isolateMessenger.toIsolateMessenger(),
+      messenger: isolateMessenger.toIsolateMessenger(),
     );
 
     IsolatedMethodChannelMiddleware(isolateMessenger).initialize();

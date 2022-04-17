@@ -16,14 +16,12 @@ class Combine {
 
   Future<CombineIsolate> spawn<T>(
     IsolateEntryPoint<T> entryPoint, {
-    Map<String, Object?> argumentsMap = const {},
     T? argument,
     bool errorsAreFatal = true,
     String? debugName = "combine_isolate",
   }) async {
     return _isolateFactory.create(
       entryPoint,
-      argumentsMap: argumentsMap,
       argument: argument,
       debugName: debugName,
       errorsAreFatal: errorsAreFatal,

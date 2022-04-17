@@ -4,5 +4,6 @@
       80,
     ],
   },
-  "dart.lineLength": 80
+  "dart.lineLength": 80,
+  "markdown.extension.toc.levels": "2..3"
 }

@@ -9,7 +9,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
@@ -39,11 +38,18 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _createCounterIsolate() async {
+    MethodChannel;
+    BinaryMessenger;
+    CombineIsolate combineIsolate = await Combine().spawn((context) async {
+      final textFromTestAsset = await rootBundle.loadString("assets/test.txt");
+      print("Text from test asset: $textFromTestAsset");
+    });
+
     final isolate = await Combine().spawn(
       (context) {
-        final messenger = context.isolateMessenger;
+        final messenger = context.messenger;
         var counter = 0;
-        messenger.messagesStream.listen((event) {
+        messenger.messages.listen((event) {
           if (event == "increment") {
             messenger.send(++counter);
           }
@@ -54,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     _counterIsolate = isolate;
     setState(() {});
-    isolate.messenger.messagesStream.listen((event) {
+    isolate.messenger.messages.listen((event) {
       if (event is int) {
         _counter = event;
         setState(() {});
@@ -65,9 +71,9 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _createAssetsIsolate() async {
     final isolate = await Combine().spawn<String>(
       (context) {
-        final messenger = context.isolateMessenger;
+        final messenger = context.messenger;
 
-        messenger.messagesStream.listen((event) async {
+        messenger.messages.listen((event) async {
           if (event is String) {
             try {
               final assetString = await rootBundle.loadString(event);
@@ -81,12 +87,11 @@ class _MyHomePageState extends State<MyHomePage> {
       },
       debugName: "assets",
       argument: "initial asset",
-      argumentsMap: {"initial": "asset"},
     );
 
     _assetsIsolate = isolate;
     setState(() {});
-    isolate.messenger.messagesStream.listen((event) {
+    isolate.messenger.messages.listen((event) {
       if (event is String) {
         _loadedAssetString = event;
         setState(() {});

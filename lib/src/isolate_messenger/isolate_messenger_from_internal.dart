@@ -8,7 +8,7 @@ class IsolateMessengerFromInternal extends IsolateMessenger {
   final InternalIsolateMessenger _internalIsolateMessenger;
 
   @override
-  Stream<Object?> get messagesStream => _internalIsolateMessenger.messagesStream
+  Stream<Object?> get messages => _internalIsolateMessenger.messagesStream
       .where((event) => event is! IsolateEvent);
 
   @override
