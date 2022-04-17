@@ -38,13 +38,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _createCounterIsolate() async {
-    MethodChannel;
-    BinaryMessenger;
-    CombineIsolate combineIsolate = await Combine().spawn((context) async {
-      final textFromTestAsset = await rootBundle.loadString("assets/test.txt");
-      print("Text from test asset: $textFromTestAsset");
-    });
-
     final isolate = await Combine().spawn(
       (context) {
         final messenger = context.messenger;

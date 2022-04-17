@@ -5,7 +5,7 @@ class WebInternalIsolateMessenger extends InternalIsolateMessenger {
 
   @override
   final Stream<Object?> messagesStream;
-  
+
   final Sink<Object?> _sink;
 
   @override

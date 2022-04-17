@@ -35,7 +35,7 @@ class IsolatedMethodChannelMiddleware extends BinaryMessenger {
   Future<void> dispose() async {
     await _methodChannelEventsSubscription?.cancel();
   }
-  
+
   void setBinaryMessage(BinaryMessenger binaryMessenger) {
     _binaryMessenger = binaryMessenger;
   }
