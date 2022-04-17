@@ -1,7 +1,8 @@
 name: combine
 description: A new Flutter package project.
 version: 0.0.1
-homepage:
+homepage: https://github.com/Maksimka101/combine
+repository: https://github.com/Maksimka101/combine
 
 environment:
   sdk: ">=2.16.2 <3.0.0"
