@@ -16,7 +16,7 @@ So all code will work in single (main) Isolate.
 
 - [Create and maintain Isolate](#create-and-maintain-isolate)
   - [Create](#create)
-  - [Listen for errors](#listen-for-errors)
+  - [Listen to errors](#listen-to-errors)
   - [Kill](#kill)
 - [Communicate with Isolate](#communicate-with-isolate)
   - [IsolateContext](#isolatecontext)
@@ -44,10 +44,10 @@ CombineIsolate combineIsolate = await Combine().spawn((context) {
 });
 ```
 
-### Listen for errors
+### Listen to errors
 
-To listen for errors you can use `CombineIsolate.errors` getter which returns stream with errors
-from isolate.
+To listen to errors you can use `CombineIsolate.errors` getter which 
+returns stream with errors from isolate.
 
 ```dart
 CombineIsolate combineIsolate;
@@ -56,7 +56,7 @@ combineIsolate.errors.listen(print); // Listen for errors.
 
 ### Kill
 
-To kill CombineIsolate you can use `CombineIsolate.kill` method.
+You can use `CombineIsolate.kill` method to kill CombineIsolate.
 
 ```dart
 CombineIsolate combineIsolate;
@@ -91,7 +91,7 @@ To chat with Isolate you can use `IsolateMessenger`.
 It has `messages` getter with stream of messages from Isolate 
 and `send` method which sends message to Isolate.
 
-In the crated isolate you can get IsolateMessenger from `IsolateContext.messenger`. 
+In the created isolate you can get IsolateMessenger from `IsolateContext.messenger`. 
 Another IsolateMessenger can be found in `CombineIsolate`.
 
 ```dart
@@ -135,27 +135,28 @@ Explanation:
 
 ### Limitations
 
-Everything will work fine while you or your plugin just use `MethodChannel.invokeMethod` 
-or `BinaryMessenger.send` methods.
+Everything will work fine while `MethodChannel.invokeMethod` 
+or `BinaryMessenger.send` methods are used by you or your plugin.
 
-However if you or your plugin expect to receive some data from `MethodChannel.setMethodCallHandler`
-or `BinaryMessenger.handlePlatformMessage` you may notice that these methods are not working.
+However if `MethodChannel.setMethodCallHandler` or `BinaryMessenger.handlePlatformMessage`
+are used by you or your plugin you may notice that these methods are not working.
 This may happen if you didn't send any data to the platform from this Isolate. 
 
 Why? In short the reason is that plugin just sends all messages from known [method] channels
 in Main Isolate to the Combine Isolate. However [method] channel becomes known 
 when you send anything to it.
-The good news is that almost always when you want to receive messages from channel
-using `MethodChannel.setMethodCallHandler` or `BinaryMessenger.handlePlatformMessage` methods 
-firstly you send some data to this channel so it is very unlikely that you will face this problem.
+The good news is when you want to receive messages from channel using
+`MethodChannel.setMethodCallHandler` or `BinaryMessenger.handlePlatformMessage` methods 
+almost always firstly you send some data to this channel 
+so it is very unlikely that you will face this problem.
 
 # Additional information
 
 [Limitation](#limitations) may be fixed by some cool hacks and I'll try to do it later.
 
-Also as you may have already noticed this package is in alpha version. \
+Also as you might have noticed this package is in alpha version. \
 So firstly it means that API may be changed. \
 Secondly it means that I need to do a lot of things so I need your help. If you like this package
-please like and start it! If you have something to say please create an issue! \
+please like and star it! If you have something to say please create an issue! \
 I want to know that this package can help someone. It will give me the strength to continue
 working on it :)
