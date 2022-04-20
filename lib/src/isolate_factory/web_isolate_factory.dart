@@ -27,8 +27,6 @@ class IsolateFactoryImpl extends IsolateFactory {
       toIsolate.sink,
     );
 
-    // This function run isolated function (IsolateRun).
-    // ignore: unawaited_futures
     final context = IsolateContext(
       messenger: WebInternalIsolateMessenger(
         toIsolateStream,
@@ -37,7 +35,7 @@ class IsolateFactoryImpl extends IsolateFactory {
       argument: argument,
     );
 
-    unawaited(_isolateRun(context, entryPoint));
+    await _isolateRun(context, entryPoint);
 
     return WebCombineIsolate(
       isolateMessenger.toIsolateMessenger(),

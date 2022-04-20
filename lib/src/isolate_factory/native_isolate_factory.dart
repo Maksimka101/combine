@@ -47,7 +47,11 @@ class IsolateFactoryImpl extends IsolateFactory {
       ServicesBinding.instance!.defaultBinaryMessenger,
       isolateMessenger,
     ).initialize();
-    return NativeCombineIsolate(isolate, isolateMessenger.toIsolateMessenger());
+    return NativeCombineIsolate(
+      isolate,
+      isolateMessenger.toIsolateMessenger(),
+      receivePort.close,
+    );
   }
 
   static void _runInIsolate<T>(_IsolateSetup<T> setup) {
