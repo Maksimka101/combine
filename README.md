@@ -1,5 +1,8 @@
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-purple.svg" alt="License: MIT"></a>
 <a href="https://pub.dev/packages/combine"><img src="https://img.shields.io/pub/v/combine.svg" alt="Pub"></a>
+<a href="https://codecov.io/gh/Maksimka101/combine">
+  <img src="https://codecov.io/gh/Maksimka101/combine/branch/master/graph/badge.svg?token=B6UDB81K4Z"/>
+</a>
 
 
 This plugin **Combines** Isolate and MethodChannel. \

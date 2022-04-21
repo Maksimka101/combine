@@ -37,6 +37,7 @@ void commonCombineTest() {
 
     isolate.messenger.send(null);
     expect(await isolate.messenger.messages.first, 2);
+    isolate.kill();
   });
 
   test('Test with complex counter', () async {
@@ -54,6 +55,7 @@ void commonCombineTest() {
 
     isolate.messenger.send(DecrementEvent());
     expect(await isolate.messenger.messages.first, const CounterInfoEvent(0));
+    isolate.kill();
   });
 
   test(
@@ -78,6 +80,7 @@ void commonCombineTest() {
 
     isolate.messenger.send(null);
     expect(await isolate.messenger.messages.first, 2);
+    isolate.kill();
   });
 
   test("Can't communicate with killed isolate", () async {
@@ -90,11 +93,13 @@ void commonCombineTest() {
     await null;
 
     expect(isDone, isTrue);
+    isolate.kill();
   });
 
   test('Argument is passed correctly', () async {
     const argument = CounterInfoEvent(42);
     final isolate = await spawnArgumentsResendIsolate(argument);
     expect(await isolate.messenger.messages.first, argument);
+    isolate.kill();
   });
 }
