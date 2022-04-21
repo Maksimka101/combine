@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2022-04-21 03:52:07</td>
+            <td class="headerValue">2022-04-21 05:11:43</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -65,17 +65,17 @@
 <a name="3"><span class="lineNum">       3 </span>            : import 'package:combine/src/isolate_messenger/internal_isolate_messenger/internal_isolate_messenger.dart';</a>
 <a name="4"><span class="lineNum">       4 </span>            : </a>
 <a name="5"><span class="lineNum">       5 </span>            : class IsolateMessengerFromInternal extends IsolateMessenger {</a>
-<a name="6"><span class="lineNum">       6 </span><span class="lineCov">          4 :   IsolateMessengerFromInternal(this._internalIsolateMessenger);</span></a>
+<a name="6"><span class="lineNum">       6 </span><span class="lineCov">          5 :   IsolateMessengerFromInternal(this._internalIsolateMessenger);</span></a>
 <a name="7"><span class="lineNum">       7 </span>            : </a>
 <a name="8"><span class="lineNum">       8 </span>            :   final InternalIsolateMessenger _internalIsolateMessenger;</a>
 <a name="9"><span class="lineNum">       9 </span>            : </a>
-<a name="10"><span class="lineNum">      10 </span><span class="lineCov">          4 :   @override</span></a>
-<a name="11"><span class="lineNum">      11 </span><span class="lineCov">          8 :   Stream&lt;Object?&gt; get messages =&gt; _internalIsolateMessenger.messagesStream</span></a>
-<a name="12"><span class="lineNum">      12 </span><span class="lineCov">         12 :       .where((event) =&gt; event is! IsolateEvent);</span></a>
+<a name="10"><span class="lineNum">      10 </span><span class="lineCov">          5 :   @override</span></a>
+<a name="11"><span class="lineNum">      11 </span><span class="lineCov">         10 :   Stream&lt;Object?&gt; get messages =&gt; _internalIsolateMessenger.messagesStream</span></a>
+<a name="12"><span class="lineNum">      12 </span><span class="lineCov">         15 :       .where((event) =&gt; event is! IsolateEvent);</span></a>
 <a name="13"><span class="lineNum">      13 </span>            : </a>
-<a name="14"><span class="lineNum">      14 </span><span class="lineCov">          4 :   @override</span></a>
+<a name="14"><span class="lineNum">      14 </span><span class="lineCov">          5 :   @override</span></a>
 <a name="15"><span class="lineNum">      15 </span>            :   void send(Object? message) {</a>
-<a name="16"><span class="lineNum">      16 </span><span class="lineCov">          8 :     _internalIsolateMessenger.send(message);</span></a>
+<a name="16"><span class="lineNum">      16 </span><span class="lineCov">         10 :     _internalIsolateMessenger.send(message);</span></a>
 <a name="17"><span class="lineNum">      17 </span>            :   }</a>
 <a name="18"><span class="lineNum">      18 </span>            : }</a>
 </pre>

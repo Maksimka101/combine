@@ -35,23 +35,14 @@ class IsolateFactoryImpl extends IsolateFactory {
       argument: argument,
     );
 
-    await _isolateRun(context, entryPoint);
+    /// Schedules [entryPoint] to run after user code is launched.
+    await null;
+    entryPoint(context);
 
     return WebCombineIsolate(
       isolateMessenger.toIsolateMessenger(),
       fromIsolate,
       toIsolate,
     );
-  }
-
-  /// Schedules [isolateRun] to run after [UIIsolateManager] is created.
-  ///
-  /// Otherwise [IsolateBlocsInitialized] event won't be handled by [UIIsolateManager].
-  Future<void> _isolateRun(
-    IsolateContext context,
-    IsolateEntryPoint isolateRun,
-  ) async {
-    await Future.delayed(Duration.zero);
-    isolateRun(context);
   }
 }

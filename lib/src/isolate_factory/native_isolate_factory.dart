@@ -43,14 +43,17 @@ class IsolateFactoryImpl extends IsolateFactory {
       receivePortStream,
     );
 
-    UIMethodChannelMiddleware(
+    final methodChannelMiddleware = UIMethodChannelMiddleware(
       ServicesBinding.instance!.defaultBinaryMessenger,
       isolateMessenger,
-    ).initialize();
+    )..initialize();
     return NativeCombineIsolate(
       isolate,
       isolateMessenger.toIsolateMessenger(),
-      receivePort.close,
+      () {
+        receivePort.close();
+        methodChannelMiddleware.dispose();
+      },
     );
   }
 

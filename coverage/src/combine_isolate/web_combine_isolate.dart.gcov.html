@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2022-04-21 03:52:07</td>
+            <td class="headerValue">2022-04-21 05:11:43</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -65,7 +65,7 @@
 <a name="3"><span class="lineNum">       3 </span>            : import 'package:combine/combine.dart';</a>
 <a name="4"><span class="lineNum">       4 </span>            : </a>
 <a name="5"><span class="lineNum">       5 </span>            : class WebCombineIsolate extends CombineIsolate {</a>
-<a name="6"><span class="lineNum">       6 </span><span class="lineCov">          4 :   WebCombineIsolate(this.messenger, this.fromIsolate, this.toIsolate);</span></a>
+<a name="6"><span class="lineNum">       6 </span><span class="lineCov">          5 :   WebCombineIsolate(this.messenger, this.fromIsolate, this.toIsolate);</span></a>
 <a name="7"><span class="lineNum">       7 </span>            : </a>
 <a name="8"><span class="lineNum">       8 </span>            :   final StreamController&lt;Object?&gt; fromIsolate;</a>
 <a name="9"><span class="lineNum">       9 </span>            : </a>
@@ -77,10 +77,10 @@
 <a name="15"><span class="lineNum">      15 </span><span class="lineNoCov">          0 :   @override</span></a>
 <a name="16"><span class="lineNum">      16 </span>            :   Stream&lt;Object?&gt; get errors =&gt; const Stream.empty();</a>
 <a name="17"><span class="lineNum">      17 </span>            : </a>
-<a name="18"><span class="lineNum">      18 </span><span class="lineCov">          4 :   @override</span></a>
+<a name="18"><span class="lineNum">      18 </span><span class="lineCov">          5 :   @override</span></a>
 <a name="19"><span class="lineNum">      19 </span>            :   void kill({int priority = 1}) {</a>
-<a name="20"><span class="lineNum">      20 </span><span class="lineCov">          8 :     fromIsolate.close();</span></a>
-<a name="21"><span class="lineNum">      21 </span><span class="lineCov">          8 :     toIsolate.close();</span></a>
+<a name="20"><span class="lineNum">      20 </span><span class="lineCov">         10 :     fromIsolate.close();</span></a>
+<a name="21"><span class="lineNum">      21 </span><span class="lineCov">         10 :     toIsolate.close();</span></a>
 <a name="22"><span class="lineNum">      22 </span>            :   }</a>
 <a name="23"><span class="lineNum">      23 </span>            : </a>
 <a name="24"><span class="lineNum">      24 </span><span class="lineNoCov">          0 :   @override</span></a>

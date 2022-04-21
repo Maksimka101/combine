@@ -10,3 +10,6 @@ abstract class IsolateFactory {
     bool errorsAreFatal = true,
   });
 }
+
+/// Typedef for a function which will be called in Isolate.
+typedef IsolateEntryPoint<T> = void Function(IsolateContext context);

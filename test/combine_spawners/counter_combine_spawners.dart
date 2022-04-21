@@ -1,13 +1,12 @@
 import 'package:combine/combine.dart';
-import 'package:combine/src/isolate_factory/isolate_factory.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const _counterMethodChannel = MethodChannel("counter");
 
-Future<CombineIsolate> spawnSimpleCounterIsolate(IsolateFactory factory) {
-  return factory.create((context) {
+Future<CombineIsolate> spawnSimpleCounterIsolate() {
+  return Combine().spawn((context) {
     var counter = 0;
     context.messenger.messages.listen((event) {
       context.messenger.send(++counter);
@@ -15,13 +14,11 @@ Future<CombineIsolate> spawnSimpleCounterIsolate(IsolateFactory factory) {
   });
 }
 
-Future<CombineIsolate> spawnMethodChannelCounterIsolate(
-  IsolateFactory factory,
-) {
+Future<CombineIsolate> spawnMethodChannelCounterIsolate() {
   var counter = 0;
   _counterMethodChannel.setMockMethodCallHandler((call) async => ++counter);
 
-  return factory.create((context) {
+  return Combine().spawn((context) {
     context.messenger.messages.listen((event) async {
       context.messenger.send(
         await _counterMethodChannel.invokeMethod("increment"),
@@ -30,8 +27,33 @@ Future<CombineIsolate> spawnMethodChannelCounterIsolate(
   });
 }
 
-Future<CombineIsolate> spawnEventCounterIsolate(IsolateFactory factory) {
-  return factory.create((context) {
+Future<CombineIsolate> spawnComplexMethodChannelCounterIsolate() {
+  var counter = 0;
+  _counterMethodChannel.setMockMethodCallHandler((call) {
+    _counterMethodChannel.binaryMessenger.handlePlatformMessage(
+      "counter",
+      const StandardMethodCodec().encodeMethodCall(
+        MethodCall("counter", ++counter),
+      ),
+      (data) {},
+    );
+
+    return null;
+  });
+
+  return Combine().spawn((context) {
+    _counterMethodChannel.setMethodCallHandler((call) async {
+      context.messenger.send(call.arguments);
+    });
+
+    context.messenger.messages.listen((event) {
+      _counterMethodChannel.invokeMethod("increment");
+    });
+  });
+}
+
+Future<CombineIsolate> spawnEventCounterIsolate() {
+  return Combine().spawn((context) {
     var counter = 0;
     context.messenger.messages.listen((event) {
       if (event is IncrementEvent) {

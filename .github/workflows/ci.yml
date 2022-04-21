@@ -1,0 +1,42 @@
+name: compose action
+
+on:
+  push:
+    paths-ignore:
+      - "**/*README*.md"
+  workflow_dispatch:
+
+jobs:
+  analyze:
+    name: flutter analyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: "8"
+      - uses: subosito/flutter-action@v1
+        with:
+          channel: "stable"
+      - run: |
+          flutter pub get
+          flutter analyze
+
+  test:
+    name: flutter test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: "8"
+      - uses: subosito/flutter-action@v1
+        with:
+          channel: "stable"
+      - run: |
+          flutter pub get
+          flutter test --coverage
+      - uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./coverage

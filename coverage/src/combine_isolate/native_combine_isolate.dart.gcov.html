@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2022-04-21 03:52:07</td>
+            <td class="headerValue">2022-04-21 05:11:43</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -67,7 +67,7 @@
 <a name="5"><span class="lineNum">       5 </span>            : import 'package:flutter/foundation.dart';</a>
 <a name="6"><span class="lineNum">       6 </span>            : </a>
 <a name="7"><span class="lineNum">       7 </span>            : class NativeCombineIsolate extends CombineIsolate {</a>
-<a name="8"><span class="lineNum">       8 </span><span class="lineCov">          4 :   NativeCombineIsolate(this._isolate, this.messenger, this.onKill);</span></a>
+<a name="8"><span class="lineNum">       8 </span><span class="lineCov">          5 :   NativeCombineIsolate(this._isolate, this.messenger, this.onKill);</span></a>
 <a name="9"><span class="lineNum">       9 </span>            : </a>
 <a name="10"><span class="lineNum">      10 </span>            :   final Isolate _isolate;</a>
 <a name="11"><span class="lineNum">      11 </span>            :   final VoidCallback onKill;</a>
@@ -83,10 +83,10 @@
 <a name="21"><span class="lineNum">      21 </span><span class="lineNoCov">          0 :     _isolate.setErrorsFatal(errorsAreFatal);</span></a>
 <a name="22"><span class="lineNum">      22 </span>            :   }</a>
 <a name="23"><span class="lineNum">      23 </span>            : </a>
-<a name="24"><span class="lineNum">      24 </span><span class="lineCov">          4 :   @override</span></a>
+<a name="24"><span class="lineNum">      24 </span><span class="lineCov">          5 :   @override</span></a>
 <a name="25"><span class="lineNum">      25 </span>            :   void kill({int priority = Isolate.beforeNextEvent}) {</a>
-<a name="26"><span class="lineNum">      26 </span><span class="lineCov">          8 :     _isolate.kill(priority: priority);</span></a>
-<a name="27"><span class="lineNum">      27 </span><span class="lineCov">          8 :     onKill();</span></a>
+<a name="26"><span class="lineNum">      26 </span><span class="lineCov">         10 :     _isolate.kill(priority: priority);</span></a>
+<a name="27"><span class="lineNum">      27 </span><span class="lineCov">         10 :     onKill();</span></a>
 <a name="28"><span class="lineNum">      28 </span>            :   }</a>
 <a name="29"><span class="lineNum">      29 </span>            : }</a>
 </pre>

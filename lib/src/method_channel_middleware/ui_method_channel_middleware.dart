@@ -58,11 +58,12 @@ class UIMethodChannelMiddleware {
   /// Isolate's platform channel.
   void _methodChannelResponse(String id, ByteData? response) {
     final completer = _messageHandlersCompleter.remove(id);
-    if (completer == null) {
-      throw _UnexpectedMethodChannelResponse();
-    } else {
-      completer.complete(response);
-    }
+    assert(
+      completer != null,
+      "Failed to send response from Isolate MessageChannel "
+      "to the main Isolate's platform channel.\n",
+    );
+    completer?.complete(response);
   }
 
   /// Send event to the platform and send response to the IsolateBloc's Isolate.
@@ -99,14 +100,5 @@ class UIMethodChannelMiddleware {
     for (final channel in _methodChannels) {
       _binaryMessenger.setMessageHandler(channel, null);
     }
-  }
-}
-
-class _UnexpectedMethodChannelResponse implements Exception {
-  @override
-  String toString() {
-    return "Failed to send response from IsolateBloc's MessageChannel "
-        "to the main Isolate's platform channel.\n"
-        "This is internal error";
   }
 }

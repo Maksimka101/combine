@@ -20,20 +20,14 @@ class IsolatedMethodChannelMiddleware extends BinaryMessenger {
   late BinaryMessenger _binaryMessenger;
   final IdGenerator _generateId;
   final _platformResponsesCompleter = <String, Completer<ByteData?>>{};
-  StreamSubscription<IsolateEvent>? _methodChannelEventsSubscription;
 
   /// Starts listening for [MethodChannelEvent]s from UI Isolate and sets middleware for [MethodChannel].
   void initialize() {
     instance = this;
-    _methodChannelEventsSubscription = _isolateMessenger.messagesStream
+    _isolateMessenger.messagesStream
         .where((event) => event is IsolateEvent)
         .cast<IsolateEvent>()
         .listen(_listenForMethodChannelEvents);
-  }
-
-  /// Free all resources and remove middleware from [MethodChannel]
-  Future<void> dispose() async {
-    await _methodChannelEventsSubscription?.cancel();
   }
 
   void setBinaryMessage(BinaryMessenger binaryMessenger) {
@@ -67,11 +61,12 @@ class IsolatedMethodChannelMiddleware extends BinaryMessenger {
   /// Sends response from platform channel to it's message handler.
   void _platformChannelResponse(String id, ByteData? response) {
     final completer = _platformResponsesCompleter.remove(id);
-    if (completer == null) {
-      throw _UnexpectedPlatformChannelResponse();
-    } else {
-      completer.complete(response);
-    }
+    assert(
+      completer != null,
+      "Failed to send response from platform channel "
+      "to it's message handler.",
+    );
+    completer?.complete(response);
   }
 
   @override
@@ -95,14 +90,6 @@ class IsolatedMethodChannelMiddleware extends BinaryMessenger {
   @override
   void setMessageHandler(String channel, MessageHandler? handler) {
     _binaryMessenger.setMessageHandler(channel, handler);
-  }
-}
-
-class _UnexpectedPlatformChannelResponse implements Exception {
-  @override
-  String toString() {
-    return "Failed to send response from platform channel "
-        "to it's message handler.\nThis is internal error";
   }
 }
 

@@ -1,7 +1,6 @@
 import 'package:combine/src/combine_isolate/combine_isolate.dart';
-import 'package:combine/src/isolate_context.dart';
-import 'package:combine/src/isolate_factory/native_isolate_factory.dart'
-    if (dart.library.html) 'package:combine/src/isolate_factory/web_isolate_factory.dart';
+import 'package:combine/src/isolate_factory/effective_isolate_factory.dart';
+import 'package:combine/src/isolate_factory/isolate_factory.dart';
 
 /// [Combine] is used to [spawn] a new [CombineIsolate].
 class Combine {
@@ -15,8 +14,6 @@ class Combine {
   /// only while first usage.
   static late final _instance = Combine._();
 
-  final _isolateFactory = IsolateFactoryImpl();
-
   /// Create a new [CombineIsolate] which is just a representation of `Isolate`
   /// so when you create a [CombineIsolate].
   ///
@@ -29,7 +26,7 @@ class Combine {
     bool errorsAreFatal = true,
     String? debugName = "combine_isolate",
   }) async {
-    return _isolateFactory.create(
+    return effectiveIsolateFactory.create(
       entryPoint,
       argument: argument,
       debugName: debugName,
@@ -37,6 +34,3 @@ class Combine {
     );
   }
 }
-
-/// Typedef for a function which will be called in Isolate.
-typedef IsolateEntryPoint<T> = void Function(IsolateContext context);
