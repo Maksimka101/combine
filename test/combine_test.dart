@@ -26,6 +26,17 @@ void main() {
 
     commonCombineTest();
   });
+
+  test(
+    "'effectiveIsolateFactory' returns native factory because tests are run in native env",
+    () async {
+      cleanTestIsolateFactory();
+      expect(
+        effectiveIsolateFactory.runtimeType,
+        native_factory.IsolateFactoryImpl,
+      );
+    },
+  );
 }
 
 void commonCombineTest() {

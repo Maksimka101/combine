@@ -13,14 +13,8 @@ class WebCombineIsolate extends CombineIsolate {
   final IsolateMessenger messenger;
 
   @override
-  Stream<Object?> get errors => const Stream.empty();
-
-  @override
   void kill({int priority = 1}) {
     fromIsolate.close();
     toIsolate.close();
   }
-
-  @override
-  void setErrorsFatal({required bool errorsAreFatal}) {}
 }
