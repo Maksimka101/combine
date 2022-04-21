@@ -1,3 +1,7 @@
+<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-purple.svg" alt="License: MIT"></a>
+<a href="https://pub.dev/packages/combine"><img src="https://img.shields.io/pub/v/combine.svg" alt="Pub"></a>
+
+
 This plugin **Combines** Isolate and MethodChannel. \
 In other words it provides a way to use flutter plugins in `Isolate`
 or just work with user friendly API for Isolate.
