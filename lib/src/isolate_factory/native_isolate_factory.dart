@@ -35,7 +35,7 @@ class IsolateFactoryImpl extends IsolateFactory {
       paused: false,
     );
 
-    final receivePortStream = receivePort.asBroadcastStream().cast<Object>();
+    final receivePortStream = receivePort.asBroadcastStream().cast<Object?>();
     final sendPort = await receivePortStream.first as SendPort;
 
     final isolateMessenger = NativeInternalIsolateMessenger(
@@ -61,7 +61,7 @@ class IsolateFactoryImpl extends IsolateFactory {
     final receivePort = ReceivePort();
     final isolateMessenger = NativeInternalIsolateMessenger(
       setup.sendPort,
-      receivePort.asBroadcastStream().cast<Object>(),
+      receivePort.asBroadcastStream().cast<Object?>(),
     );
     isolateMessenger.send(receivePort.sendPort);
 
