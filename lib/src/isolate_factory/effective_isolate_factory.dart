@@ -8,6 +8,11 @@ void setTestIsolateFactory(IsolateFactory isolateFactory) {
   _testIsolateFactory = isolateFactory;
 }
 
+@visibleForTesting
+void cleanTestIsolateFactory() {
+  _testIsolateFactory = null;
+}
+
 IsolateFactory? _testIsolateFactory;
 
 /// Returns test isolate factory or it's implementation depending on the platform.

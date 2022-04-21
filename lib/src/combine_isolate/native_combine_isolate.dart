@@ -14,14 +14,6 @@ class NativeCombineIsolate extends CombineIsolate {
   final IsolateMessenger messenger;
 
   @override
-  Stream<Object?> get errors => _isolate.errors;
-
-  @override
-  void setErrorsFatal({required bool errorsAreFatal}) {
-    _isolate.setErrorsFatal(errorsAreFatal);
-  }
-
-  @override
   void kill({int priority = Isolate.beforeNextEvent}) {
     _isolate.kill(priority: priority);
     onKill();

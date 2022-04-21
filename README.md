@@ -161,7 +161,7 @@ so it is very unlikely that you will face this problem.
 
 [Limitation](#limitations) may be fixed by some cool hacks and I'll try to do it later.
 
-Also as you might have noticed this package is in alpha version. \
+Also as you might have noticed this package is in beta version. \
 So firstly it means that API may be changed. \
 Secondly it means that I need to do a lot of things so I need your help. If you like this package
 please like and star it! If you have something to say please create an issue! \
