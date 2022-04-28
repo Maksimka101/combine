@@ -14,13 +14,13 @@ class IsolateFactoryImpl extends IsolateFactory {
     String? debugName,
     bool errorsAreFatal = true,
   }) async {
-    // Will be closed by [WebIsolateWrapper.kill].
+    // Will be closed by [WebCombineIsolate.kill].
     // ignore: close_sinks
-    final fromIsolate = StreamController<Object?>.broadcast();
+    final fromIsolate = StreamController<Object?>();
     // ignore: close_sinks
-    final toIsolate = StreamController<Object?>.broadcast();
-    final toIsolateStream = toIsolate.stream;
-    final fromIsolateStream = fromIsolate.stream;
+    final toIsolate = StreamController<Object?>();
+    final toIsolateStream = toIsolate.stream.asBroadcastStream();
+    final fromIsolateStream = fromIsolate.stream.asBroadcastStream();
 
     final isolateMessenger = WebInternalIsolateMessenger(
       fromIsolateStream,
@@ -35,9 +35,9 @@ class IsolateFactoryImpl extends IsolateFactory {
       argument: argument,
     );
 
-    /// Schedules [entryPoint] to run after user code is launched.
-    await null;
-    entryPoint(context);
+    runZoned(() {
+      entryPoint(context);
+    });
 
     return WebCombineIsolate(
       isolateMessenger.toIsolateMessenger(),
