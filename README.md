@@ -21,6 +21,7 @@ So all code will work in single (main) Isolate.
 
 # Index
 
+- [Short usage example](#short-usage-example)
 - [Create and maintain Isolate](#create-and-maintain-isolate)
   - [Create](#create)
   - [Listen to errors](#listen-to-errors)
@@ -34,6 +35,30 @@ So all code will work in single (main) Isolate.
   - [Limitations](#limitations)
 
 # Usage
+
+## Short usage example
+
+```dart
+CombineIsolate isolate = await Combine().spawn((context) {
+  print("Argument from main isolate: ${context.argument}");
+
+  context.messenger.messages.listen((message) {
+    print("Message from main isolate: $message");
+    context.messenger.send("Hello from isolate!");
+  });
+}, argument: 42);
+
+isolate.messenger
+  ..messages.listen((message) {
+    print("Message from isolate: $message");
+  })
+  ..send("Hello from main isolate!");
+
+// Will print:
+// Argument from main isolate: 42
+// Message from main isolate: Hello from main isolate!
+// Message from isolate: Hello from isolate!
+```
 
 ## Create and maintain Isolate
 
