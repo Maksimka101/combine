@@ -113,4 +113,17 @@ void commonCombineTest() {
     expect(await isolate.messenger.messages.first, argument);
     isolate.kill();
   });
+
+  test(
+      'No event is lost. '
+      'First event is received because argument is resend instantly. '
+      'Second event is received because it is instantly send from main isolate.',
+      () async {
+    const argument = CounterInfoEvent(42);
+    final isolate = await spawnInstantArgumentsResendIsolate(argument);
+    isolate.messenger.send(argument);
+    final receivedAMessages = await isolate.messenger.messages.take(2).toList();
+    expect(receivedAMessages, [argument, argument]);
+    isolate.kill();
+  });
 }
