@@ -13,7 +13,7 @@ void main() {
 
   group("Test with native isolate factory", () {
     setUpAll(() {
-      setTestIsolateFactory(native_factory.IsolateFactoryImpl());
+      setTestIsolateFactory(native_factory.NativeIsolateFactory());
     });
 
     commonCombineTest();
@@ -21,7 +21,7 @@ void main() {
 
   group("Test with web isolate factory", () {
     setUpAll(() {
-      setTestIsolateFactory(web_factory.IsolateFactoryImpl());
+      setTestIsolateFactory(web_factory.WebIsolateFactory());
     });
 
     commonCombineTest();
@@ -33,7 +33,7 @@ void main() {
       cleanTestIsolateFactory();
       expect(
         effectiveIsolateFactory.runtimeType,
-        native_factory.IsolateFactoryImpl,
+        native_factory.NativeIsolateFactory,
       );
     },
   );
