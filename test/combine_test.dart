@@ -1,8 +1,6 @@
 import 'package:combine/src/isolate_factory/effective_isolate_factory.dart';
-import 'package:combine/src/isolate_factory/native_isolate_factory.dart'
-    as native_factory;
-import 'package:combine/src/isolate_factory/web_isolate_factory.dart'
-    as web_factory;
+import 'package:combine/src/isolate_factory/native_isolate_factory.dart';
+import 'package:combine/src/isolate_factory/web_isolate_factory.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'combine_spawners/arguments_resend_combine_spawner.dart';
@@ -13,7 +11,7 @@ void main() {
 
   group("Test with native isolate factory", () {
     setUpAll(() {
-      setTestIsolateFactory(native_factory.NativeIsolateFactory());
+      setTestIsolateFactory(NativeIsolateFactory());
     });
 
     commonCombineTest();
@@ -21,7 +19,7 @@ void main() {
 
   group("Test with web isolate factory", () {
     setUpAll(() {
-      setTestIsolateFactory(web_factory.WebIsolateFactory());
+      setTestIsolateFactory(WebIsolateFactory());
     });
 
     commonCombineTest();
@@ -33,7 +31,7 @@ void main() {
       cleanTestIsolateFactory();
       expect(
         effectiveIsolateFactory.runtimeType,
-        native_factory.NativeIsolateFactory,
+        NativeIsolateFactory,
       );
     },
   );
