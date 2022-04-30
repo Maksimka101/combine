@@ -46,4 +46,5 @@ class WebIsolateFactory extends IsolateFactory {
   }
 }
 
+/// This typedef is used for conditional import.
 typedef IsolateFactoryImpl = WebIsolateFactory;

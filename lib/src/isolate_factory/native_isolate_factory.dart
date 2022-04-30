@@ -89,4 +89,5 @@ class _IsolateSetup<T> {
   final T? argument;
 }
 
+/// This typedef is used for conditional import.
 typedef IsolateFactoryImpl = NativeIsolateFactory;
