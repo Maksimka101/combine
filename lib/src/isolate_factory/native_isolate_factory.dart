@@ -4,7 +4,6 @@ import 'dart:isolate';
 import 'package:combine/combine.dart';
 import 'package:combine/src/bindings/isolate_bindings/isolate_binding.dart';
 import 'package:combine/src/combine_isolate/native_combine_isolate.dart';
-import 'package:combine/src/isolate_factory/isolate_factory.dart';
 import 'package:combine/src/isolate_messenger/internal_isolate_messenger/native_internal_isolate_messenger.dart';
 import 'package:combine/src/method_channel_middleware/isolated_method_channel_middleware.dart';
 import 'package:combine/src/method_channel_middleware/ui_method_channel_middleware.dart';
@@ -12,7 +11,7 @@ import 'package:flutter/services.dart';
 
 /// It is used to create [Isolate] and setup all necessary stuff
 /// which is needed to use method channels.
-class IsolateFactoryImpl extends IsolateFactory {
+class NativeIsolateFactory extends IsolateFactory {
   @override
   Future<CombineIsolate> create<T>(
     IsolateEntryPoint<T> entryPoint, {
@@ -89,3 +88,6 @@ class _IsolateSetup<T> {
   final Map<String, Object?>? argumentsMap;
   final T? argument;
 }
+
+/// This typedef is used for conditional import.
+typedef IsolateFactoryImpl = NativeIsolateFactory;
