@@ -105,17 +105,25 @@ Do you remember `context` argument in `entryPointFunction`? Let's take a closer 
 which is used to communicate with original Isolate.
 
 ### Pass arguments
-To provide argument just pass it to the `spawn` function.
+
+You can just use variables from closure or
+provide argument by passing it to the `spawn` function.
 
 ```dart
+final argumentFromClosure = "This is argument from main Isolate";
 Combine().spawn(
   (context) {
     final argument = context.argument as String;
     print(argument); // Print: This is my argument
+    print(argumentFromClosure); // Print: This is argument from main Isolate
   },
   argument: "This is my argument",
 );
 ```
+
+Arguments from closure will be copied to the Isolate. They may be mutable however mutable
+variable won't be synchronized so if you change it in main Isolate it won't be changed in 
+Combine Isolate.
 
 ### Chat with Isolate
 
