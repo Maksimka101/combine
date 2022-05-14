@@ -27,8 +27,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   var _counter = 0;
   var _loadedAssetString = "No assets loaded";
-  CombineIsolate? _counterIsolate;
-  CombineIsolate? _assetsIsolate;
+  final _calculatedFibonacciValues = <int>[];
+  Object? _calculateFibonacciError;
+  CombineInfo? _counterIsolate;
+  CombineInfo? _assetsIsolate;
 
   @override
   void initState() {
@@ -79,7 +81,6 @@ class _MyHomePageState extends State<MyHomePage> {
         });
       },
       debugName: "assets",
-      argument: "initial asset",
     );
 
     _assetsIsolate = isolate;
@@ -115,6 +116,23 @@ class _MyHomePageState extends State<MyHomePage> {
               subtitle: Text(_loadedAssetString),
               onTap: _onLoadAsset,
             ),
+            ListTile(
+              title: const Text("Calculate fibonacci numbers"),
+              subtitle: const Text(
+                "from zero to the counter number using CombineWorker",
+              ),
+              onTap: _onCalculateAllFibNumbers,
+            ),
+            if (_calculatedFibonacciValues.isNotEmpty)
+              ListTile(
+                title: const Text("Last 10 fibonacci numbers"),
+                subtitle: Text(_calculatedFibonacciValues.take(10).join(", ")),
+              ),
+            if (_calculateFibonacciError != null)
+              ListTile(
+                title: const Text("Error from calculate fibonacci worker"),
+                subtitle: Text(_calculateFibonacciError.toString()),
+              ),
           ]
         ],
       ),
@@ -129,5 +147,35 @@ class _MyHomePageState extends State<MyHomePage> {
     _assetsIsolate?.messenger.send("assets/test.txt");
     _loadedAssetString = "Loading in progress";
     setState(() {});
+  }
+
+  void _onCalculateAllFibNumbers() {
+    for (var i = 0; i < _counter; i++) {
+      CombineWorker().executeWithArg(calculateFibonacci, i).then(
+        (value) {
+          _calculatedFibonacciValues.insert(0, value);
+          setState(() {});
+        },
+      ).onError((error, stackTrace) {
+        setState(() => _calculateFibonacciError = error);
+      });
+    }
+  }
+}
+
+int calculateFibonacci(int number) {
+  if (number == 16) {
+    throw UnsupportedError("Can't calculate value for $number");
+  }
+  return _calculateFibonacci(number);
+}
+
+int _calculateFibonacci(int number) {
+  if (number == 0) {
+    return 0;
+  } else if (number == 1 || number == 2) {
+    return 1;
+  } else {
+    return _calculateFibonacci(number - 1) + _calculateFibonacci(number - 2);
   }
 }

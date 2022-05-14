@@ -24,7 +24,6 @@ So all code will work in single (main) Isolate.
 - [Short usage example](#short-usage-example)
 - [Create and maintain Isolate](#create-and-maintain-isolate)
   - [Create](#create)
-  - [Listen to errors](#listen-to-errors)
   - [Kill](#kill)
 - [Communicate with Isolate](#communicate-with-isolate)
   - [IsolateContext](#isolatecontext)
@@ -39,7 +38,7 @@ So all code will work in single (main) Isolate.
 ## Short usage example
 
 ```dart
-CombineIsolate isolate = await Combine().spawn((context) {
+CombineInfo isolateInfo = await Combine().spawn((context) {
   print("Argument from main isolate: ${context.argument}");
 
   context.messenger.messages.listen((message) {
@@ -48,7 +47,7 @@ CombineIsolate isolate = await Combine().spawn((context) {
   });
 }, argument: 42);
 
-isolate.messenger
+isolateInfo.messenger
   ..messages.listen((message) {
     print("Message from isolate: $message");
   })
@@ -70,20 +69,13 @@ Isolate will be created under the hood except web platform.
 To create a new CombineIsolate you just need to call `Combine().spawn(entryPointFunction)`.
 `entryPointFunction` is a function which will be called in Isolate.
 
+`CombineInfo` will be returned which holds `CombineIsolate` to control `Isolate`
+and `IsolateMessenger` to communicate with it.
+
 ```dart
-CombineIsolate combineIsolate = await Combine().spawn((context) {
+CombineInfo combineInfo = await Combine().spawn((context) {
   print("Hello from Isolate!!!");
 });
-```
-
-### Listen to errors
-
-To listen to errors you can use `CombineIsolate.errors` getter which 
-returns stream with errors from isolate.
-
-```dart
-CombineIsolate combineIsolate;
-combineIsolate.errors.listen(print); // Listen for errors.
 ```
 
 ### Kill
@@ -101,8 +93,9 @@ combineIsolate.kill(); // Kill Isolate.
 
 Do you remember `context` argument in `entryPointFunction`? Let's take a closer look at it.
 
-`IsolateContext` holds an argument, passed while you spawn Isolate and `IsolateMessenger` 
-which is used to communicate with original Isolate.
+`IsolateContext` holds an argument, passed while you spawn Isolate, `IsolateMessenger` 
+which is used to communicate with original Isolate and `CombineIsolate` which is 
+represents current Isolate.
 
 ### Pass arguments
 
@@ -135,7 +128,7 @@ In the created isolate you can get IsolateMessenger from `IsolateContext.messeng
 Another IsolateMessenger can be found in `CombineIsolate`.
 
 ```dart
-CombineIsolate combineIsolate = await Combine().spawn((context) {
+CombineInfo combineInfo = await Combine().spawn((context) {
   context.messenger
     ..messages.listen(
       (event) => print("Message from Main Isolate: $event"),
@@ -143,10 +136,10 @@ CombineIsolate combineIsolate = await Combine().spawn((context) {
     ..send("Hello from Combine Isolate!");
 });
 
-combineIsolate.messenger.messages.listen(
+combineInfo.messenger.messages.listen(
   (event) {
     print("Message from Combine Isolate: $event");
-    combineIsolate.messenger.send("Hello from Main Isolate!");
+    combineInfo.messenger.send("Hello from Main Isolate!");
   },
 );
 ```

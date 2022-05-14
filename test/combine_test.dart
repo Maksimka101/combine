@@ -39,77 +39,77 @@ void main() {
 
 void commonCombineTest() {
   test('Test with simple counter', () async {
-    final isolate = await spawnSimpleCounterIsolate();
+    final combineInfo = await spawnSimpleCounterIsolate();
 
-    isolate.messenger.send(null);
-    expect(await isolate.messenger.messages.first, 1);
+    combineInfo.messenger.send(null);
+    expect(await combineInfo.messenger.messages.first, 1);
 
-    isolate.messenger.send(null);
-    expect(await isolate.messenger.messages.first, 2);
-    isolate.kill();
+    combineInfo.messenger.send(null);
+    expect(await combineInfo.messenger.messages.first, 2);
+    combineInfo.isolate.kill();
   });
 
   test('Test with complex counter', () async {
-    final isolate = await spawnEventCounterIsolate();
-    isolate.messenger.send(IncrementEvent());
+    final combineInfo = await spawnEventCounterIsolate();
+    combineInfo.messenger.send(IncrementEvent());
 
-    expect(await isolate.messenger.messages.first, const CounterInfoEvent(1));
+    expect(await combineInfo.messenger.messages.first, const CounterInfoEvent(1));
 
-    isolate.messenger.send(IncrementEvent());
-    expect(await isolate.messenger.messages.first, const CounterInfoEvent(2));
+    combineInfo.messenger.send(IncrementEvent());
+    expect(await combineInfo.messenger.messages.first, const CounterInfoEvent(2));
 
-    isolate.messenger.send(null);
-    isolate.messenger.send(DecrementEvent());
-    expect(await isolate.messenger.messages.first, const CounterInfoEvent(1));
+    combineInfo.messenger.send(null);
+    combineInfo.messenger.send(DecrementEvent());
+    expect(await combineInfo.messenger.messages.first, const CounterInfoEvent(1));
 
-    isolate.messenger.send(DecrementEvent());
-    expect(await isolate.messenger.messages.first, const CounterInfoEvent(0));
-    isolate.kill();
+    combineInfo.messenger.send(DecrementEvent());
+    expect(await combineInfo.messenger.messages.first, const CounterInfoEvent(0));
+    combineInfo.isolate.kill();
   });
 
   test(
     "Test method channel using counter which incremented in 'platform'",
     () async {
-      final isolate = await spawnMethodChannelCounterIsolate();
+      final combineInfo = await spawnMethodChannelCounterIsolate();
 
-      isolate.messenger.send(null);
-      expect(await isolate.messenger.messages.first, 1);
+      combineInfo.messenger.send(null);
+      expect(await combineInfo.messenger.messages.first, 1);
 
-      isolate.messenger.send(null);
-      expect(await isolate.messenger.messages.first, 2);
-      isolate.kill();
+      combineInfo.messenger.send(null);
+      expect(await combineInfo.messenger.messages.first, 2);
+      combineInfo.isolate.kill();
     },
   );
 
   test("Test method channel invoked from platform", () async {
-    final isolate = await spawnComplexMethodChannelCounterIsolate();
+    final combineInfo = await spawnComplexMethodChannelCounterIsolate();
 
-    isolate.messenger.send(null);
-    expect(await isolate.messenger.messages.first, 1);
+    combineInfo.messenger.send(null);
+    expect(await combineInfo.messenger.messages.first, 1);
 
-    isolate.messenger.send(null);
-    expect(await isolate.messenger.messages.first, 2);
-    isolate.kill();
+    combineInfo.messenger.send(null);
+    expect(await combineInfo.messenger.messages.first, 2);
+    combineInfo.isolate.kill();
   });
 
   test("Can't communicate with killed isolate", () async {
-    final isolate = await spawnSimpleCounterIsolate();
+    final combineInfo = await spawnSimpleCounterIsolate();
     var isDone = false;
 
-    isolate.messenger.messages.listen((event) {}, onDone: () => isDone = true);
-    isolate.kill();
+    combineInfo.messenger.messages.listen((event) {}, onDone: () => isDone = true);
+    combineInfo.isolate.kill();
     // Wait when on kill stuff will be done.
     await null;
 
     expect(isDone, isTrue);
-    isolate.kill();
+    combineInfo.isolate.kill();
   });
 
   test('Argument is passed correctly', () async {
     const argument = CounterInfoEvent(42);
-    final isolate = await spawnArgumentsResendIsolate(argument);
-    expect(await isolate.messenger.messages.first, argument);
-    isolate.kill();
+    final combineInfo = await spawnArgumentsResendIsolate(argument);
+    expect(await combineInfo.messenger.messages.first, argument);
+    combineInfo.isolate.kill();
   });
 
   test(
@@ -118,10 +118,10 @@ void commonCombineTest() {
       'Second event is received because it is instantly send from main isolate.',
       () async {
     const argument = CounterInfoEvent(42);
-    final isolate = await spawnInstantArgumentsResendIsolate(argument);
-    isolate.messenger.send(argument);
-    final receivedAMessages = await isolate.messenger.messages.take(2).toList();
+    final combineInfo = await spawnInstantArgumentsResendIsolate(argument);
+    combineInfo.messenger.send(argument);
+    final receivedAMessages = await combineInfo.messenger.messages.take(2).toList();
     expect(receivedAMessages, [argument, argument]);
-    isolate.kill();
+    combineInfo.isolate.kill();
   });
 }
