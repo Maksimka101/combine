@@ -7,4 +7,4 @@ class WebWorkerManagerFactory extends CombineWorkerManagerFactory {
   CombineWorkerManager create({int? isolatesCount}) => WebWorkerManager();
 }
 
-typedef WorkerManagerFactoryImpl = WebWorkerManagerFactory;
+typedef CombineWorkerManagerFactoryImpl = WebWorkerManagerFactory;
