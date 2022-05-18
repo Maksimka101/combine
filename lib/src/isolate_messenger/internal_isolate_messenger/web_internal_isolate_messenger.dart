@@ -10,6 +10,9 @@ class WebInternalIsolateMessenger extends InternalIsolateMessenger {
 
   @override
   void send(Object? message) {
+    if (isClosed) {
+      throw IsolateClosedException();
+    }
     _sink.add(message);
   }
 }

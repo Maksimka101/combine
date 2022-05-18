@@ -3,6 +3,7 @@ library combine;
 export 'src/combine_info.dart';
 export 'src/combine_isolate/combine_isolate.dart';
 export 'src/combine_singleton.dart';
+export 'src/combine_worker/combine_worker_impl.dart';
 export 'src/combine_worker/combine_worker_manager.dart';
 export 'src/combine_worker/effective_worker_factory.dart';
 export 'src/combine_worker/native_worker_manager.dart';

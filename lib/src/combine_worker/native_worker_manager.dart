@@ -4,41 +4,90 @@ import 'dart:collection';
 import 'package:combine/src/combine_worker/combine_task_executor.dart';
 import 'package:combine/src/combine_worker/combine_worker_manager.dart';
 import 'package:combine/src/combine_worker/tasks.dart';
+import 'package:combine/src/combine_worker_singleton.dart';
 
 class NativeWorkerManager extends CombineWorkerManager {
   NativeWorkerManager(this.isolatesCount);
 
   final int isolatesCount;
-  var _taskQueues = <CombineTaskExecutor>[];
-  final _actionsQueue = Queue<TaskInfo>();
+  final _taskExecutors = <CombineTaskExecutor>[];
+  final _tasksQueue = Queue<TaskInfo>();
+  final _initializationCompleter = Completer();
+  final _lastTaskCompleter = Completer();
+  var _isClosed = false;
 
   @override
   Future<void> initialize() async {
-    _taskQueues = await Future.wait(
+    assert(
+      !_initializationCompleter.isCompleted,
+      "Internal error. Worker manager is initialized twice.",
+    );
+    await Future.wait(
       [
         for (var i = 0; i < isolatesCount; i++)
-          CombineTaskExecutor.initializeExecutor(_actionsQueue),
+          CombineTaskExecutor.createExecutor(
+            _tasksQueue,
+          ).then(_addTaskExecutor),
       ],
     );
-    await _tryToStartExecution();
+    _initializationCompleter.complete();
+  }
+
+  void _addTaskExecutor(CombineTaskExecutor taskExecutor) {
+    _taskExecutors.add(taskExecutor);
+    _tryToStartExecution();
   }
 
   @override
-  Future<T> execute<T>(ExecutableTask<T> task) {
-    final completer = Completer<T>();
-    _actionsQueue.add(TaskInfo(task, completer));
+  Future<T> execute<T>(ExecutableTask<T> task) async {
+    assert(!_isClosed, "Internal error. Can't execute task in closed manager");
+
+    final completer = Completer();
+    _tasksQueue.add(TaskInfo(task, completer));
     _tryToStartExecution();
-    return completer.future;
+    final result = await completer.future;
+    _markLastTaskAsCompletedIfNeeded();
+    return result;
   }
 
-  void addTasksAndExecute(List<TaskInfo> tasks) {
-    _actionsQueue.addAll(tasks);
-    _tryToStartExecution();
+  @override
+  Future<void> close({bool waitForRemainingTasks = false}) async {
+    // Ensure that initialization is completed and isolates are created.
+    await _initializationCompleter.future;
+    assert(
+      _taskExecutors.isNotEmpty,
+      "Internal error. "
+      "Seems like initialization is incomplete and isolates are not created",
+    );
+    _isClosed = true;
+
+    if (waitForRemainingTasks) {
+      _markLastTaskAsCompletedIfNeeded();
+      await _lastTaskCompleter.future;
+    } else {
+      for (final task in _tasksQueue) {
+        task.resultCompleter.completeError(CombineWorkerClosedException());
+      }
+    }
+
+    for (final taskExecutor in _taskExecutors) {
+      taskExecutor.close();
+    }
   }
 
-  Future<void> _tryToStartExecution() async {
-    for (final taskQueue in _taskQueues) {
-      unawaited(taskQueue.executeActionIfAny());
+  /// This function is used to wait for remaining tasks when worker is closed with corresponding parameter.
+  void _markLastTaskAsCompletedIfNeeded() {
+    final executorsAreWorking = _taskExecutors.any(
+      (executor) => executor.isWorking,
+    );
+    if (_isClosed && !executorsAreWorking && _tasksQueue.isEmpty) {
+      _lastTaskCompleter.complete();
+    }
+  }
+
+  void _tryToStartExecution() {
+    for (final taskQueue in _taskExecutors) {
+      unawaited(taskQueue.tryToExecuteActionIfAny());
     }
   }
 }

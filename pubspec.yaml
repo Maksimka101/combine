@@ -18,5 +18,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   all_lint_rules_community: ^0.0.9
+  mocktail: ^0.3.0
+  meta: ^1.7.0
 
 flutter:

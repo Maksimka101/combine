@@ -30,8 +30,8 @@ class Combine {
     return effectiveIsolateFactory.create(
       entryPoint,
       argument: argument,
-      debugName: debugName,
       errorsAreFatal: errorsAreFatal,
+      debugName: debugName,
     );
   }
 }

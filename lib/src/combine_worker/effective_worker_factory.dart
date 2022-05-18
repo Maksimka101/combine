@@ -18,3 +18,17 @@ CombineWorkerManagerFactory? _testWorkerFactory;
 CombineWorkerManagerFactory get effectiveWorkerFactory {
   return _testWorkerFactory ?? CombineWorkerManagerFactoryImpl();
 }
+
+@visibleForTesting
+void setTestIsolatesCount(int count) {
+  _testIsolatesCount = count;
+}
+
+@visibleForTesting
+void clearTestIsolatesCount() {
+  _testIsolatesCount = null;
+}
+
+int? _testIsolatesCount;
+
+int? get testIsolatesCount => _testIsolatesCount;

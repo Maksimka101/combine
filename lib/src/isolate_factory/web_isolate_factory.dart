@@ -34,7 +34,7 @@ class WebIsolateFactory extends IsolateFactory {
         fromIsolate.sink,
       ).toIsolateMessenger(),
       argument: argument,
-      isolate: WebCombineIsolate(fromIsolate, toIsolate),
+      isolate: WebCombineIsolate(() {}),
     );
 
     runZoned(() {
@@ -42,10 +42,11 @@ class WebIsolateFactory extends IsolateFactory {
     });
 
     return CombineInfo(
-      isolate: WebCombineIsolate(
-        fromIsolate,
-        toIsolate,
-      ),
+      isolate: WebCombineIsolate(() {
+        fromIsolate.close();
+        toIsolate.close();
+        isolateMessenger.markAsClosed();
+      }),
       messenger: isolateMessenger.toIsolateMessenger(),
     );
   }

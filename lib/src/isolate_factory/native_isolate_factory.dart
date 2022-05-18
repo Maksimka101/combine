@@ -45,15 +45,15 @@ class NativeIsolateFactory extends IsolateFactory {
     );
 
     final methodChannelMiddleware = UIMethodChannelMiddleware(
-      ServicesBinding.instance!.defaultBinaryMessenger,
+      ServicesBinding.instance.defaultBinaryMessenger,
       isolateMessenger,
     )..initialize();
     return CombineInfo(
       isolate: NativeCombineIsolate(
         isolate,
         () {
-          receivePort.close();
           methodChannelMiddleware.dispose();
+          isolateMessenger.markAsClosed();
         },
       ),
       messenger: isolateMessenger.toIsolateMessenger(),

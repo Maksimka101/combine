@@ -10,4 +10,7 @@ abstract class CombineWorkerManager {
   Future<void> initialize();
 
   Future<T> execute<T>(ExecutableTask<T> task);
+
+  /// Kills all created [CombineIsolate]s.
+  Future<void> close({required bool waitForRemainingTasks});
 }

@@ -1,6 +1,7 @@
 import 'package:combine/src/isolate_factory/effective_isolate_factory.dart';
 import 'package:combine/src/isolate_factory/native_isolate_factory.dart';
 import 'package:combine/src/isolate_factory/web_isolate_factory.dart';
+import 'package:combine/src/isolate_messenger/internal_isolate_messenger/internal_isolate_messenger.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'combine_spawners/arguments_resend_combine_spawner.dart';
@@ -53,17 +54,29 @@ void commonCombineTest() {
     final combineInfo = await spawnEventCounterIsolate();
     combineInfo.messenger.send(IncrementEvent());
 
-    expect(await combineInfo.messenger.messages.first, const CounterInfoEvent(1));
+    expect(
+      await combineInfo.messenger.messages.first,
+      const CounterInfoEvent(1),
+    );
 
     combineInfo.messenger.send(IncrementEvent());
-    expect(await combineInfo.messenger.messages.first, const CounterInfoEvent(2));
+    expect(
+      await combineInfo.messenger.messages.first,
+      const CounterInfoEvent(2),
+    );
 
     combineInfo.messenger.send(null);
     combineInfo.messenger.send(DecrementEvent());
-    expect(await combineInfo.messenger.messages.first, const CounterInfoEvent(1));
+    expect(
+      await combineInfo.messenger.messages.first,
+      const CounterInfoEvent(1),
+    );
 
     combineInfo.messenger.send(DecrementEvent());
-    expect(await combineInfo.messenger.messages.first, const CounterInfoEvent(0));
+    expect(
+      await combineInfo.messenger.messages.first,
+      const CounterInfoEvent(0),
+    );
     combineInfo.isolate.kill();
   });
 
@@ -94,15 +107,12 @@ void commonCombineTest() {
 
   test("Can't communicate with killed isolate", () async {
     final combineInfo = await spawnSimpleCounterIsolate();
-    var isDone = false;
-
-    combineInfo.messenger.messages.listen((event) {}, onDone: () => isDone = true);
     combineInfo.isolate.kill();
-    // Wait when on kill stuff will be done.
-    await null;
 
-    expect(isDone, isTrue);
-    combineInfo.isolate.kill();
+    expect(
+      () => combineInfo.messenger.send(""),
+      throwsA(isA<IsolateClosedException>()),
+    );
   });
 
   test('Argument is passed correctly', () async {
@@ -120,7 +130,8 @@ void commonCombineTest() {
     const argument = CounterInfoEvent(42);
     final combineInfo = await spawnInstantArgumentsResendIsolate(argument);
     combineInfo.messenger.send(argument);
-    final receivedAMessages = await combineInfo.messenger.messages.take(2).toList();
+    final receivedAMessages =
+        await combineInfo.messenger.messages.take(2).toList();
     expect(receivedAMessages, [argument, argument]);
     combineInfo.isolate.kill();
   });

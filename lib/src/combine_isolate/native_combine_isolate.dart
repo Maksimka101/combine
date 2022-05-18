@@ -11,7 +11,7 @@ class NativeCombineIsolate extends CombineIsolate {
 
   @override
   void kill({int priority = Isolate.beforeNextEvent}) {
-    _isolate.kill(priority: priority);
     onKill();
+    _isolate.kill(priority: priority);
   }
 }

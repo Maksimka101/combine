@@ -1,89 +1,82 @@
 import 'dart:async';
 
 abstract class ExecutableTask<T> {
-  ExecutableTask(this.id);
-
-  final String id;
+  const ExecutableTask();
 
   FutureOr<T> execute();
 }
 
 class NoArgsTask<T> extends ExecutableTask<T> {
-  NoArgsTask(this.task, String id) : super(id);
+  const NoArgsTask(this.task);
 
   final Task<T> task;
 
   @override
-  FutureOr<T> execute() {
-    return task();
-  }
+  FutureOr<T> execute() => task();
 }
 
 class TaskWithArg<T, Q> extends ExecutableTask<T> {
-  TaskWithArg(this.task, this.argument, String id) : super(id);
+  const TaskWithArg(this.task, this.argument);
 
   final Task1<T, Q> task;
   final Q argument;
 
   @override
-  FutureOr<T> execute() {
-    return task(argument);
-  }
+  FutureOr<T> execute() => task(argument);
 }
 
 class TaskWith2Args<T, Q, C> extends ExecutableTask<T> {
-  TaskWith2Args(
+  const TaskWith2Args(
     this.task,
     this.argument,
     this.argument2,
-    String id,
-  ) : super(id);
+  );
 
   final Task3<T, Q, C> task;
   final Q argument;
   final C argument2;
 
   @override
-  FutureOr<T> execute() {
-    return task(argument, argument2);
-  }
+  FutureOr<T> execute() => task(argument, argument2);
 }
 
 class TaskInfo<T> {
-  TaskInfo(this.task, this.resultCompleter);
+  const TaskInfo(this.task, this.resultCompleter);
 
   final ExecutableTask<T> task;
   final Completer<T> resultCompleter;
 }
 
 abstract class TaskResponse<T> {
-  TaskResponse(this.id);
-
-  final String id;
+  const TaskResponse();
 
   void complete(Completer<T> completer);
 }
 
 class TaskValueResponse<T> extends TaskResponse<T> {
-  TaskValueResponse(String id, this.data) : super(id);
+  const TaskValueResponse(this.data);
 
   final T data;
 
   @override
   void complete(Completer<T> completer) {
-    completer.complete(data);
+    if (!completer.isCompleted) {
+      completer.complete(data);
+    }
   }
 }
 
 class TaskErrorResponse<T> extends TaskResponse<T> {
-  TaskErrorResponse(String id, this.error, this.stackTrace) : super(id);
+  const TaskErrorResponse(this.error, this.stackTrace);
 
   final Object error;
   final StackTrace stackTrace;
 
   @override
   void complete(Completer<T> completer) {
-    completer.completeError(error, stackTrace);
+    if (!completer.isCompleted) {
+      completer.completeError(error, stackTrace);
+    }
   }
 }
 

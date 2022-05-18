@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:combine/src/combine_worker/combine_worker_manager.dart';
 import 'package:combine/src/combine_worker/tasks.dart';
 
@@ -10,4 +12,7 @@ class WebWorkerManager extends CombineWorkerManager {
     await null;
     return task.execute();
   }
+
+  @override
+  Future<void> close({required bool waitForRemainingTasks}) async {}
 }
