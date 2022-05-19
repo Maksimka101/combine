@@ -16,9 +16,6 @@ or just work with user friendly API for Isolate.
 - Use Method Channels in Isolate. 
 - Supports all flutter platforms.
 
-❌️ It doesn't create Isolate alternative (aka service worker) in web.
-So all code will work in single (main) Isolate.
-
 # Index
 
 - [Short usage example](#short-usage-example)

@@ -10,7 +10,7 @@ const defaultTasksPerIsolate = 2;
 
 /// {@template combine_worker_singleton}
 /// Combine Worker is a pool of [CombineIsolate]s that efficiently executes
-/// tasks in isolates. It is primarily used to reduce the number of isolates
+/// tasks in them. It is primarily used to reduce the number of isolates
 /// and provide more performant and easy way to execute tasks.
 ///
 /// In compare to fluter's [compute] method that creates isolate each time
