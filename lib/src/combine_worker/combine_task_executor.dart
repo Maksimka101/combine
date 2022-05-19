@@ -14,7 +14,8 @@ import 'package:uuid/uuid.dart';
 class CombineTaskExecutor {
   CombineTaskExecutor._(
     this._combineInfo,
-    this._tasksQueue, [
+    this._tasksQueue,
+    this._tasksPerIsolate, [
     IdGenerator? idGenerator,
   ])  : _idGenerator = idGenerator ?? const Uuid().v4,
         _isolateMessenger = _combineInfo.messenger;
@@ -23,27 +24,30 @@ class CombineTaskExecutor {
   final CombineInfo _combineInfo;
   final IdGenerator _idGenerator;
   final IsolateMessenger _isolateMessenger;
-  Completer? _lastTaskCompleter;
+  final int _tasksPerIsolate;
+  final List<Completer> _currentTasksCompleters = [];
 
-  bool get isWorking => _lastTaskCompleter != null;
+  bool get isFullOfTasks => _currentTasksCompleters.length == _tasksPerIsolate;
+  bool get isWorking => _currentTasksCompleters.isNotEmpty;
 
   static Future<CombineTaskExecutor> createExecutor(
     Queue<TaskInfo> actionsQueue,
+    int tasksPerIsolate,
   ) async {
     final combineInfo = await Combine().spawn(
       _isolateEntryPoint,
       errorsAreFatal: false,
     );
-    return CombineTaskExecutor._(combineInfo, actionsQueue);
+    return CombineTaskExecutor._(combineInfo, actionsQueue, tasksPerIsolate);
   }
 
   /// Executes actions from [_tasksQueue] if any and if it is not working.
   Future<void> tryToExecuteActionIfAny() async {
-    if (_tasksQueue.isNotEmpty && !isWorking) {
+    if (_tasksQueue.isNotEmpty && !isFullOfTasks) {
       final task = _tasksQueue.removeFirst();
-      _lastTaskCompleter = task.resultCompleter;
+      _currentTasksCompleters.add(task.resultCompleter);
       await _sendMessageAndReceiveResponse(task);
-      _lastTaskCompleter = null;
+      _currentTasksCompleters.remove(task.resultCompleter);
       unawaited(tryToExecuteActionIfAny());
     }
   }
@@ -51,7 +55,9 @@ class CombineTaskExecutor {
   /// Kills [CombineIsolate].
   void close() {
     _combineInfo.isolate.kill();
-    _lastTaskCompleter?.completeError(CombineWorkerClosedException());
+    for (final currentTaskCompleter in _currentTasksCompleters) {
+      currentTaskCompleter.completeError(CombineWorkerClosedException());
+    }
   }
 
   Future<void> _sendMessageAndReceiveResponse(TaskInfo taskInfo) async {

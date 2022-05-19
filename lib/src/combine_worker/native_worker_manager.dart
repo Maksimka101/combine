@@ -7,9 +7,13 @@ import 'package:combine/src/combine_worker/tasks.dart';
 import 'package:combine/src/combine_worker_singleton.dart';
 
 class NativeWorkerManager extends CombineWorkerManager {
-  NativeWorkerManager(this.isolatesCount);
+  NativeWorkerManager({
+    required this.isolatesCount,
+    required this.tasksPerIsolate,
+  });
 
   final int isolatesCount;
+  final int tasksPerIsolate;
   final _taskExecutors = <CombineTaskExecutor>[];
   final _tasksQueue = Queue<TaskInfo>();
   final _initializationCompleter = Completer();
@@ -27,6 +31,7 @@ class NativeWorkerManager extends CombineWorkerManager {
         for (var i = 0; i < isolatesCount; i++)
           CombineTaskExecutor.createExecutor(
             _tasksQueue,
+            tasksPerIsolate,
           ).then(_addTaskExecutor),
       ],
     );
@@ -48,6 +53,23 @@ class NativeWorkerManager extends CombineWorkerManager {
     final result = await completer.future;
     _markLastTaskAsCompletedIfNeeded();
     return result;
+  }
+
+  /// Schedule execution.
+  ///
+  /// Firstly try to schedule for free executors which are not working.
+  /// Then try to schedule for wording but not busy executors.
+  void _tryToStartExecution() {
+    _taskExecutors
+        .where((executor) => !executor.isWorking)
+        .forEach(_triggerExecutor);
+    _taskExecutors
+        .where((executor) => !executor.isFullOfTasks)
+        .forEach(_triggerExecutor);
+  }
+
+  void _triggerExecutor(CombineTaskExecutor executor) {
+    executor.tryToExecuteActionIfAny();
   }
 
   @override
@@ -75,19 +97,14 @@ class NativeWorkerManager extends CombineWorkerManager {
     }
   }
 
-  /// This function is used to wait for remaining tasks when worker is closed with corresponding parameter.
+  /// This function is used to wait for remaining tasks
+  /// when worker is [close]d with `waitForRemainingTasks` parameter.
   void _markLastTaskAsCompletedIfNeeded() {
     final executorsAreWorking = _taskExecutors.any(
       (executor) => executor.isWorking,
     );
     if (_isClosed && !executorsAreWorking && _tasksQueue.isEmpty) {
       _lastTaskCompleter.complete();
-    }
-  }
-
-  void _tryToStartExecution() {
-    for (final taskQueue in _taskExecutors) {
-      unawaited(taskQueue.tryToExecuteActionIfAny());
     }
   }
 }

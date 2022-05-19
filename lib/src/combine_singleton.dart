@@ -1,11 +1,17 @@
 import 'package:combine/src/combine_info.dart';
 import 'package:combine/src/combine_isolate/combine_isolate.dart';
+import 'package:combine/src/combine_worker_singleton.dart';
 import 'package:combine/src/isolate_factory/effective_isolate_factory.dart';
 import 'package:combine/src/isolate_factory/isolate_factory.dart';
 import 'package:combine/src/isolate_messenger/isolate_messenger.dart';
 
+/// {@template combine_singleton}
 /// [Combine] is used to [spawn] a new [CombineIsolate].
+/// 
+/// Take a look at [CombineWorker] if you want to efficiently execute tasks in isolates pool.
+/// {@endtemplate}
 class Combine {
+  /// {@macro combine_singleton}
   factory Combine() => _instance;
   Combine._();
 

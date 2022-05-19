@@ -13,7 +13,10 @@ class CombineWorkerImpl implements CombineWorker {
 
   /// {@macro combine_worker_initialize}
   @override
-  Future<void> initialize({int? isolatesCount}) async {
+  Future<void> initialize({
+    int? isolatesCount,
+    int tasksPerIsolate = defaultTasksPerIsolate,
+  }) async {
     assert(
       isolatesCount == null || isolatesCount > 0,
       "`isolatesCount` must be greater than zero if specified.",
@@ -23,9 +26,14 @@ class CombineWorkerImpl implements CombineWorker {
       "`CombineWorker` is already initialized.\n"
       "This may happen if you call some `execute` function before `initialize`.\n",
     );
+    assert(
+      tasksPerIsolate > 0,
+      "`tasksPerIsolate` parameter must be greater that zero",
+    );
 
     _isInitialized = true;
     _workerManager = effectiveWorkerFactory.create(
+      tasksPerIsolate: tasksPerIsolate,
       isolatesCount: isolatesCount,
     );
     await _effectiveWorkerManager.initialize();
