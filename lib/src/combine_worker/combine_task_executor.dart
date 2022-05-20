@@ -6,10 +6,9 @@ import 'package:combine/src/combine_isolate/combine_isolate.dart';
 import 'package:combine/src/combine_singleton.dart';
 import 'package:combine/src/combine_worker/tasks.dart';
 import 'package:combine/src/combine_worker_singleton.dart';
+import 'package:combine/src/id_generator.dart/id_generator.dart';
 import 'package:combine/src/isolate_context.dart';
 import 'package:combine/src/isolate_messenger/isolate_messenger.dart';
-import 'package:combine/src/method_channel_middleware/isolated_method_channel_middleware.dart';
-import 'package:uuid/uuid.dart';
 
 class CombineTaskExecutor {
   CombineTaskExecutor._(
@@ -17,7 +16,7 @@ class CombineTaskExecutor {
     this._tasksQueue,
     this._tasksPerIsolate, [
     IdGenerator? idGenerator,
-  ])  : _idGenerator = idGenerator ?? const Uuid().v4,
+  ])  : _idGenerator = idGenerator = IdGenerator(),
         _isolateMessenger = _combineInfo.messenger;
 
   final Queue<TaskInfo> _tasksQueue;
@@ -88,13 +87,13 @@ class CombineTaskExecutor {
 class _ExecutableTaskRequest<T> {
   _ExecutableTaskRequest(this.taskId, this.task);
 
-  final String taskId;
+  final int taskId;
   final ExecutableTask<T> task;
 }
 
 class _ExecutableTaskResponse<T> {
   _ExecutableTaskResponse(this.taskId, this.taskResponse);
 
-  final String taskId;
+  final int taskId;
   final TaskResponse<T> taskResponse;
 }

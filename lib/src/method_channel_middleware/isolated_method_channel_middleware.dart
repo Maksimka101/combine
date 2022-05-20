@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 
+import 'package:combine/src/id_generator.dart/id_generator.dart';
 import 'package:combine/src/isolate_events.dart';
 import 'package:combine/src/isolate_messenger/internal_isolate_messenger/internal_isolate_messenger.dart';
 import 'package:flutter/services.dart';
-import 'package:uuid/uuid.dart';
 
 /// This class receives messages from [MethodChannel] and sends them to the
 /// UI Isolate.
 class IsolatedMethodChannelMiddleware extends BinaryMessenger {
   /// Creates new middleware and sets [instance].
   IsolatedMethodChannelMiddleware(this._isolateMessenger)
-      : _generateId = const Uuid().v4;
+      : _generateId = IdGenerator();
 
   /// Last created and [initialize]d middleware.
   static IsolatedMethodChannelMiddleware? instance;
@@ -19,7 +19,7 @@ class IsolatedMethodChannelMiddleware extends BinaryMessenger {
   final InternalIsolateMessenger _isolateMessenger;
   late BinaryMessenger _binaryMessenger;
   final IdGenerator _generateId;
-  final _platformResponsesCompleter = <String, Completer<ByteData?>>{};
+  final _platformResponsesCompleter = <int, Completer<ByteData?>>{};
 
   /// Starts listening for [MethodChannelEvent]s from UI Isolate and sets middleware for [MethodChannel].
   void initialize() {
@@ -52,14 +52,14 @@ class IsolatedMethodChannelMiddleware extends BinaryMessenger {
   }
 
   /// Handle platform messages and send them to it's [MessageChannel].
-  void _handlePlatformMessage(String channel, String id, ByteData? message) {
+  void _handlePlatformMessage(String channel, int id, ByteData? message) {
     handlePlatformMessage(channel, message, (data) {
       _isolateMessenger.send(MethodChannelResponseEvent(data, id));
     });
   }
 
   /// Sends response from platform channel to it's message handler.
-  void _platformChannelResponse(String id, ByteData? response) {
+  void _platformChannelResponse(int id, ByteData? response) {
     final completer = _platformResponsesCompleter.remove(id);
     assert(
       completer != null,
@@ -103,5 +103,3 @@ typedef PlatformResponseHandler = Future<ByteData?>? Function(
   String channel,
   ByteData? message,
 );
-
-typedef IdGenerator = String Function();

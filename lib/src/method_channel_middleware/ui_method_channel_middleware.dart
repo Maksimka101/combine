@@ -1,10 +1,9 @@
 import 'dart:async';
 
+import 'package:combine/src/id_generator.dart/id_generator.dart';
 import 'package:combine/src/isolate_events.dart';
 import 'package:combine/src/isolate_messenger/internal_isolate_messenger/internal_isolate_messenger.dart';
-import 'package:combine/src/method_channel_middleware/isolated_method_channel_middleware.dart';
 import 'package:flutter/services.dart';
-import 'package:uuid/uuid.dart';
 
 /// This class receives messages from [MethodChannel.setMessageHandler]
 /// registered in [MethodChannelSetup] and sends messages received from Isolate.
@@ -13,7 +12,7 @@ class UIMethodChannelMiddleware {
   UIMethodChannelMiddleware(
     this._binaryMessenger,
     this._isolateMessenger,
-  )   : _idGenerator = const Uuid().v4,
+  )   : _idGenerator = IdGenerator(),
         _methodChannels = {};
 
   static UIMethodChannelMiddleware? instance;
@@ -22,7 +21,7 @@ class UIMethodChannelMiddleware {
   final Set<String> _methodChannels;
   final IdGenerator _idGenerator;
   final InternalIsolateMessenger _isolateMessenger;
-  final _messageHandlersCompleter = <String, Completer<ByteData>>{};
+  final _messageHandlersCompleter = <int, Completer<ByteData>>{};
   StreamSubscription<IsolateEvent>? _methodChannelEventsSubscription;
 
   /// Starts listening for [IsolateEvent]s from Isolate and sets middleware for [MethodChannel].
@@ -56,7 +55,7 @@ class UIMethodChannelMiddleware {
 
   /// Send response from IsolateBloc's MessageChannel to the main
   /// Isolate's platform channel.
-  void _methodChannelResponse(String id, ByteData? response) {
+  void _methodChannelResponse(int id, ByteData? response) {
     final completer = _messageHandlersCompleter.remove(id);
     assert(
       completer != null,
@@ -67,7 +66,7 @@ class UIMethodChannelMiddleware {
   }
 
   /// Send event to the platform and send response to the IsolateBloc's Isolate.
-  Future<void> _send(String channel, ByteData? message, String id) async {
+  Future<void> _send(String channel, ByteData? message, int id) async {
     if (!_methodChannels.contains(channel)) {
       _addPlatformMessageHandler(channel);
     }
