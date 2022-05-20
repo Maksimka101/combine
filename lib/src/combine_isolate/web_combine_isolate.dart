@@ -1,20 +1,13 @@
-import 'dart:async';
-
 import 'package:combine/combine.dart';
+import 'package:flutter/material.dart';
 
 class WebCombineIsolate extends CombineIsolate {
-  WebCombineIsolate(this.messenger, this.fromIsolate, this.toIsolate);
+  WebCombineIsolate(this.onClose);
 
-  final StreamController<Object?> fromIsolate;
-
-  final StreamController<Object?> toIsolate;
-
-  @override
-  final IsolateMessenger messenger;
+  final VoidCallback onClose;
 
   @override
   void kill({int priority = 1}) {
-    fromIsolate.close();
-    toIsolate.close();
+    onClose();
   }
 }

@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:combine/src/combine_isolate/combine_isolate.dart';
+import 'package:combine/src/combine_info.dart';
 import 'package:combine/src/combine_singleton.dart';
 
-Future<CombineIsolate> spawnErrorsIsolate() {
+Future<CombineInfo> spawnErrorsIsolate() {
   return Combine().spawn(
     (context) async {
       final errorCompleter = Completer();

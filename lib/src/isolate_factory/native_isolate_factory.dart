@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:isolate';
 
-import 'package:combine/combine.dart';
 import 'package:combine/src/bindings/isolate_bindings/isolate_binding.dart';
+import 'package:combine/src/combine_info.dart';
 import 'package:combine/src/combine_isolate/native_combine_isolate.dart';
+import 'package:combine/src/isolate_context.dart';
+import 'package:combine/src/isolate_factory/isolate_factory.dart';
 import 'package:combine/src/isolate_messenger/internal_isolate_messenger/native_internal_isolate_messenger.dart';
 import 'package:combine/src/method_channel_middleware/isolated_method_channel_middleware.dart';
 import 'package:combine/src/method_channel_middleware/ui_method_channel_middleware.dart';
@@ -13,7 +15,7 @@ import 'package:flutter/services.dart';
 /// which is needed to use method channels.
 class NativeIsolateFactory extends IsolateFactory {
   @override
-  Future<CombineIsolate> create<T>(
+  Future<CombineInfo> create<T>(
     IsolateEntryPoint<T> entryPoint, {
     Map<String, Object?>? argumentsMap,
     T? argument,
@@ -43,16 +45,18 @@ class NativeIsolateFactory extends IsolateFactory {
     );
 
     final methodChannelMiddleware = UIMethodChannelMiddleware(
-      ServicesBinding.instance!.defaultBinaryMessenger,
+      ServicesBinding.instance.defaultBinaryMessenger,
       isolateMessenger,
     )..initialize();
-    return NativeCombineIsolate(
-      isolate,
-      isolateMessenger.toIsolateMessenger(),
-      () {
-        receivePort.close();
-        methodChannelMiddleware.dispose();
-      },
+    return CombineInfo(
+      isolate: NativeCombineIsolate(
+        isolate,
+        () {
+          methodChannelMiddleware.dispose();
+          isolateMessenger.markAsClosed();
+        },
+      ),
+      messenger: isolateMessenger.toIsolateMessenger(),
     );
   }
 
@@ -67,6 +71,7 @@ class NativeIsolateFactory extends IsolateFactory {
     final isolateContext = IsolateContext(
       argument: setup.argument,
       messenger: isolateMessenger.toIsolateMessenger(),
+      isolate: NativeCombineIsolate(Isolate.current, () {}),
     );
 
     IsolatedMethodChannelMiddleware(isolateMessenger).initialize();

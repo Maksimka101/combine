@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 const _counterMethodChannel = MethodChannel("counter");
 
-Future<CombineIsolate> spawnSimpleCounterIsolate() {
+Future<CombineInfo> spawnSimpleCounterIsolate() {
   return Combine().spawn((context) {
     var counter = 0;
     context.messenger.messages.listen((event) {
@@ -14,7 +14,7 @@ Future<CombineIsolate> spawnSimpleCounterIsolate() {
   });
 }
 
-Future<CombineIsolate> spawnMethodChannelCounterIsolate() {
+Future<CombineInfo> spawnMethodChannelCounterIsolate() {
   var counter = 0;
   _counterMethodChannel.setMockMethodCallHandler((call) async => ++counter);
 
@@ -27,7 +27,7 @@ Future<CombineIsolate> spawnMethodChannelCounterIsolate() {
   });
 }
 
-Future<CombineIsolate> spawnComplexMethodChannelCounterIsolate() {
+Future<CombineInfo> spawnComplexMethodChannelCounterIsolate() {
   var counter = 0;
   _counterMethodChannel.setMockMethodCallHandler((call) {
     _counterMethodChannel.binaryMessenger.handlePlatformMessage(
@@ -52,7 +52,7 @@ Future<CombineIsolate> spawnComplexMethodChannelCounterIsolate() {
   });
 }
 
-Future<CombineIsolate> spawnEventCounterIsolate() {
+Future<CombineInfo> spawnEventCounterIsolate() {
   return Combine().spawn((context) {
     var counter = 0;
     context.messenger.messages.listen((event) {

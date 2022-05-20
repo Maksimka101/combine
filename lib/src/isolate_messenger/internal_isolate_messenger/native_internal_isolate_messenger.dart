@@ -12,6 +12,9 @@ class NativeInternalIsolateMessenger extends InternalIsolateMessenger {
 
   @override
   void send(Object? message) {
+    if (isClosed) {
+      throw IsolateClosedException();
+    }
     sendPort.send(message);
   }
 }

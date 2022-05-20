@@ -13,7 +13,7 @@ class InvokePlatformChannelEvent extends IsolateEvent {
 
   final ByteData? data;
   final String channel;
-  final String id;
+  final int id;
 }
 
 /// Event with response from [MethodChannel]
@@ -22,7 +22,7 @@ class PlatformChannelResponseEvent extends IsolateEvent {
   const PlatformChannelResponseEvent(this.data, this.id);
 
   final ByteData? data;
-  final String id;
+  final int id;
 }
 
 /// Event to invoke [MethodChannel.setMethodCallHandler] in [IsolateBloc]'s isolate.
@@ -32,7 +32,7 @@ class InvokeMethodChannelEvent extends IsolateEvent {
 
   final ByteData? data;
   final String channel;
-  final String id;
+  final int id;
 }
 
 /// Event with response from [MethodChannel.setMethodCallHandler] in [IsolateBloc]'s isolate.
@@ -41,5 +41,5 @@ class MethodChannelResponseEvent extends IsolateEvent {
   const MethodChannelResponseEvent(this.data, this.id);
 
   final ByteData? data;
-  final String id;
+  final int id;
 }

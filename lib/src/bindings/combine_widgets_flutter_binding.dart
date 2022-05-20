@@ -15,10 +15,12 @@ class CombineWidgetsFlutterBinding extends BindingBase
         RendererBinding,
         WidgetsBinding {
   static WidgetsBinding ensureInitialized() {
-    if (WidgetsBinding.instance == null) {
+    try {
+      WidgetsBinding.instance;
+    } catch (_) {
       CombineWidgetsFlutterBinding();
     }
 
-    return WidgetsBinding.instance!;
+    return WidgetsBinding.instance;
   }
 }

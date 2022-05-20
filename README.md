@@ -5,41 +5,46 @@
 </a>
 
 
-This plugin **Combines** Isolate and MethodChannel. \
+This plugin **Combines** Isolate, MethodChannel and Thread Pool. \
 In other words it provides a way to use flutter plugins in `Isolate`
-or just work with user friendly API for Isolate.
+or just work with user friendly API for Isolates.
 
 # Features
 
 - Create an Isolate.
 - Communicate with Isolate without extra code.
 - Use Method Channels in Isolate. 
-- Supports all flutter platforms.
-
-❌️ It doesn't create Isolate alternative (aka service worker) in web.
-So all code will work in single (main) Isolate.
+- Efficiently execute tasks in Isolates pool. 
 
 # Index
 
 - [Short usage example](#short-usage-example)
-- [Create and maintain Isolate](#create-and-maintain-isolate)
-  - [Create](#create)
-  - [Listen to errors](#listen-to-errors)
-  - [Kill](#kill)
-- [Communicate with Isolate](#communicate-with-isolate)
-  - [IsolateContext](#isolatecontext)
-  - [Pass arguments](#pass-arguments)
-  - [Chat with Isolate](#chat-with-isolate)
-- [Dealing with MethodChannels](#dealing-with-methodchannels)
-  - [Configuration](#configuration)
-  - [Limitations](#limitations)
+- [Combine](#combine)
+  - [Create and maintain Isolate](#create-and-maintain-isolate)
+    - [Create](#create)
+    - [Kill](#kill)
+  - [Communicate with Isolate](#communicate-with-isolate)
+    - [IsolateContext](#isolatecontext)
+    - [Pass arguments](#pass-arguments)
+    - [Chat with Isolate](#chat-with-isolate)
+  - [Dealing with MethodChannels](#dealing-with-methodchannels)
+    - [Configuration](#configuration)
+- [Combine Worker](#combine-worker)
+  - [Initialize worker](#initialize-worker)
+  - [Execute tasks](#execute-tasks)
+  - [Close Worker](#close-worker)
+- [Limitations](#limitations)
+  - [Method Channel](#method-channel)
+  - [Closure variables](#closure-variables)
 
 # Usage
 
 ## Short usage example
 
+`Combine` is used to create Isolates. 
+
 ```dart
-CombineIsolate isolate = await Combine().spawn((context) {
+CombineInfo isolateInfo = await Combine().spawn((context) {
   print("Argument from main isolate: ${context.argument}");
 
   context.messenger.messages.listen((message) {
@@ -48,7 +53,7 @@ CombineIsolate isolate = await Combine().spawn((context) {
   });
 }, argument: 42);
 
-isolate.messenger
+isolateInfo.messenger
   ..messages.listen((message) {
     print("Message from isolate: $message");
   })
@@ -60,33 +65,46 @@ isolate.messenger
 // Message from isolate: Hello from isolate!
 ```
 
-## Create and maintain Isolate
+`CombineWorker` is a pool of Isolates that efficiently executes tasks in them.
 
-### Create
+In comparison to Fluter's [compute] method which creates an isolate each time
+it is called, Combine Worker creates a pool of isolates and efficiently
+reuses them.
+```dart
+final fibonacciNumber = CombineWorker().executeWithArg(calculateFibonacci, 42);
+print(fibonacciNumber); // 1655801441
 
-`CombineIsolate` is just a representation of `Isolate` so when you create a CombineIsolate
-Isolate will be created under the hood except web platform.
+int calculateFibonacci(int number) {
+  if (number == 1 || number == 2) {
+    return 1;
+  } else {
+    return calculateFibonacci(number - 1) + calculateFibonacci(number - 2);
+  }
+}
+```
+
+## Combine
+### Create and maintain Isolate
+
+#### Create
+
+`CombineIsolate` is just a representation of `Isolate` so when you create a CombineIsolate,
+an Isolate will be created under the hood. On the web, however, everything will be executed 
+on the main isolate.
 
 To create a new CombineIsolate you just need to call `Combine().spawn(entryPointFunction)`.
 `entryPointFunction` is a function which will be called in Isolate.
 
+`CombineInfo` will be returned which holds `CombineIsolate` to control `Isolate`
+and `IsolateMessenger` to communicate with it.
+
 ```dart
-CombineIsolate combineIsolate = await Combine().spawn((context) {
+CombineInfo combineInfo = await Combine().spawn((context) {
   print("Hello from Isolate!!!");
 });
 ```
 
-### Listen to errors
-
-To listen to errors you can use `CombineIsolate.errors` getter which 
-returns stream with errors from isolate.
-
-```dart
-CombineIsolate combineIsolate;
-combineIsolate.errors.listen(print); // Listen for errors.
-```
-
-### Kill
+#### Kill
 
 You can use `CombineIsolate.kill` method to kill CombineIsolate.
 
@@ -95,16 +113,17 @@ CombineIsolate combineIsolate;
 combineIsolate.kill(); // Kill Isolate.
 ```
 
-## Communicate with Isolate
+### Communicate with Isolate
 
-### IsolateContext
+#### IsolateContext
 
 Do you remember `context` argument in `entryPointFunction`? Let's take a closer look at it.
 
-`IsolateContext` holds an argument, passed while you spawn Isolate and `IsolateMessenger` 
-which is used to communicate with original Isolate.
+`IsolateContext` holds an argument, passed while you spawn Isolate, `IsolateMessenger` 
+which is used to communicate with original Isolate and `CombineIsolate` which is 
+represents current Isolate.
 
-### Pass arguments
+#### Pass arguments
 
 You can just use variables from closure or
 provide argument by passing it to the `spawn` function.
@@ -125,7 +144,7 @@ Arguments from closure will be copied to the Isolate. They may be mutable howeve
 variable won't be synchronized so if you change it in main Isolate it won't be changed in 
 Combine Isolate.
 
-### Chat with Isolate
+#### Chat with Isolate
 
 To chat with Isolate you can use `IsolateMessenger`. 
 It has `messages` getter with stream of messages from Isolate 
@@ -135,7 +154,7 @@ In the created isolate you can get IsolateMessenger from `IsolateContext.messeng
 Another IsolateMessenger can be found in `CombineIsolate`.
 
 ```dart
-CombineIsolate combineIsolate = await Combine().spawn((context) {
+CombineInfo combineInfo = await Combine().spawn((context) {
   context.messenger
     ..messages.listen(
       (event) => print("Message from Main Isolate: $event"),
@@ -143,10 +162,10 @@ CombineIsolate combineIsolate = await Combine().spawn((context) {
     ..send("Hello from Combine Isolate!");
 });
 
-combineIsolate.messenger.messages.listen(
+combineInfo.messenger.messages.listen(
   (event) {
     print("Message from Combine Isolate: $event");
-    combineIsolate.messenger.send("Hello from Main Isolate!");
+    combineInfo.messenger.send("Hello from Main Isolate!");
   },
 );
 ```
@@ -155,9 +174,9 @@ This code will give the following output:
 > Message from Combine Isolate: Hello from Combine Isolate! \
 > Message from Main Isolate: Hello from Main Isolate!
 
-## Dealing with MethodChannels
+### Dealing with MethodChannels
 
-### Configuration
+#### Configuration
 
 Everything is already configured to work with MethodChannels so you can just use them!
 
@@ -173,7 +192,54 @@ Explanation:
  - the point it that `rootBundle` uses BinaryMessenger (low level MethodChannel)
  - let's assume that file in `assets/test.txt` exists and contains `Asset is loaded!` text
 
-### Limitations
+
+## Combine Worker
+### Initialize worker
+
+To initialize worker you may call `CombineWorker().initialize()` however 
+it can be lazily initialized on the first execution so you omit calling this method.
+
+Also this method has `isolatesCount` and `tasksPerIsolate` parameters. The second parameter 
+is used to set maximum number of tasks that one isolate can perform asynchronously.
+
+### Execute tasks
+
+You can execute task with zero, one or two arguments using `execute`, `executeWithArg`
+and `executeWith2Args` methods accordingly.
+
+```dart
+final helloWorld = await CombineWorker().execute(zeroArgsFunction);
+final maksim = await CombineWorker().executeWithArg(oneArgFunction, "Maksim");
+final helloArshak  = await CombineWorker().executeWith2Args(
+  twoArgsFunction, 
+  "Hello", "Arshak!"
+);
+
+String zeroArgsFunction() => "Hello, World!";
+String oneArgFunction(String str) => str;
+String twoArgsFunction(String a, String b) => "$a, $b";
+```
+
+If some task will throw an exception, corresponding execute function 
+will completes with this exception.
+
+### Close Worker
+
+`CombineWorker().close()` method is used to close the current worker.\
+`CombineWorker` is a singleton but under the hood it uses a worker manager instance
+which can be closed and recreated. It may be useful if you want to cancel 
+all running and awaiting tasks (i. e. on user logout).
+
+When worker is closed it completes all tasks with `CombineWorkerClosedException`.\
+If you want to wait for remaining tasks set `waitForRemainingTasks` parameter to `true`.
+In that case they won't be completed with exception. 
+
+You can call `execute` or `initialize` methods without awaiting for this future.
+In that case new worker manager will be created.
+
+## Limitations
+
+### Method Channel
 
 Everything will work fine while `MethodChannel.invokeMethod` 
 or `BinaryMessenger.send` methods are used by you or your plugin.
@@ -190,9 +256,24 @@ The good news is when you want to receive messages from channel using
 almost always firstly you send some data to this channel 
 so it is very unlikely that you will face this problem.
 
+### Closure variables
+
+Isolate `entryPoint` function for `spawn` method or `task` function for `execute` methods 
+may be a first-level, as well as a static or top-level.\
+Also it may use closure variables but with some restrictions:
+ - closure variable will be copied (as every variable passed to isolate)
+   so it won't be synchronized across Isolates.
+ - if you use at least one variable from closure all closure variables
+   will be copied to the Isolate due to this [issue](https://github.com/dart-lang/sdk/issues/36983).
+   It can lead to high memory consumption or event exception because
+   some variables may contains native resources.
+
+Due to above points I highly recommend you to avoid using closure variables,
+until this issue is fixed.
+
 # Additional information
 
-[Limitation](#limitations) may be fixed by some cool hacks and I'll try to do it later.
+[Method Channel limitation](#method-channel) may be fixed by some cool hacks and I'll try to do it later.
 
 Also as you might have noticed this package is in beta version. \
 So firstly it means that API may be changed. \
