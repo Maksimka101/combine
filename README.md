@@ -71,7 +71,7 @@ In comparison to Fluter's [compute] method which creates an isolate each time
 it is called, Combine Worker creates a pool of isolates and efficiently
 reuses them.
 ```dart
-final fibonacciNumber = CombineWorker().executeWithArg(calculateFibonacci, 42);
+final fibonacciNumber = await CombineWorker().executeWithArg(calculateFibonacci, 42);
 print(fibonacciNumber); // 1655801441
 
 int calculateFibonacci(int number) {
