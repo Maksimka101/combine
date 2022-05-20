@@ -8,7 +8,7 @@ import 'package:combine/src/isolate_messenger/isolate_messenger.dart';
 /// {@template combine_singleton}
 /// [Combine] is used to [spawn] a new [CombineIsolate].
 ///
-/// Take a look at [CombineWorker] if you want to efficiently execute tasks in isolates pool.
+/// Take a look at [CombineWorker] if you want to efficiently execute tasks in isolates' pool.
 /// {@endtemplate}
 class Combine {
   /// {@macro combine_singleton}
@@ -16,34 +16,36 @@ class Combine {
   Combine._();
 
   /// `late` is used to make this singleton lazy. So it will be initialized
-  /// only while first usage.
+  /// only on first usage.
   static late final _instance = Combine._();
 
   /// Creates a new [CombineIsolate] which is just a representation of Isolate.
-  /// So when you create a [CombineIsolate] Isolate
-  /// will be created under the hood except web platform.
+  /// So when you create a [CombineIsolate], an Isolate
+  /// will be created under the hood. On the web, however,
+  /// [entryPoint] will be executed on the main isolate.
   ///
   /// [entryPoint] is a function which will be called in Isolate.
-  /// This function may be a top level function.
+  /// This function may be first-level, as well as a top-level or static.
   /// Also it may use closure variables but with some restrictions:
-  ///  - closure variable will be copped (as every variable passed to isolate)
+  ///  - closure variable will be copied (as every variable passed to isolate)
   ///    so it won't be synchronized across Isolates.
-  ///  - if you will use at least one variable from closure all closure variables
-  ///    will be copied to the Isolate due to this [issue](https://github.com/dart-lang/sdk/issues/36983).
-  ///    It can lead to the high memory consumption or event exception because
+  ///  - if you use at least one variable from closure all closure variables
+  ///    will be copied to the Isolate due to this
+  ///    [issue](https://github.com/dart-lang/sdk/issues/36983).
+  ///    It can lead to high memory consumption or event exception because
   ///    some variables may contains native resources.
   ///
-  /// Due to the above points I highly recommend you not to use closure variables
-  /// while issue is not fixed.
+  /// Due to above points, I highly recommend you to avoid using closure
+  /// variables, until this issue is fixed.
   ///
-  /// [debugName] is an Isolate's name for dev tools.
+  /// [debugName] is the Isolate's name for dev tools.
   ///
-  /// If [errorsAreFatal] is set to `true` then uncaught exception will kill Isolate.
+  /// If [errorsAreFatal] is set to `true` then uncaught exceptions will kill the Isolate.
   ///
   /// Returns [CombineInfo] which holds [CombineIsolate] to control Isolate
   /// and [IsolateMessenger] to communicate with it.
   ///
-  /// Example:
+  /// Example usage:
   /// ```dart
   /// CombineInfo isolateInfo = await Combine().spawn((context) {
   ///   print("Argument from main isolate: ${context.argument}");

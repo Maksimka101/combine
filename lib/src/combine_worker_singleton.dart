@@ -13,12 +13,12 @@ const defaultTasksPerIsolate = 2;
 /// tasks in them. It is primarily used to reduce the number of isolates
 /// and provide more performant and easy way to execute tasks.
 ///
-/// In compare to fluter's [compute] method that creates isolate each time
-/// when it is called Combine Worker creates a pool of isolates and efficiently
-/// reuse them. At the same time, it has all the advantages of [CombineIsolate],
-/// allowing you to work with platform channel in isolate.
+/// In comparison to Fluter's [compute] method which creates an isolate each time
+/// it's called, Combine Worker creates a pool of isolates and efficiently
+/// reuses them. At the same time, it has all of the advantages of [CombineIsolate],
+/// allowing you to work with platform channels in an isolate.
 ///
-/// If you want to create a single [CombineIsolate] take a look at [Combine].
+/// If you want to create a single [CombineIsolate], take a look at [Combine].
 /// {@endtemplate}
 abstract class CombineWorker {
   /// {@macro combine_worker_singleton}
@@ -28,16 +28,19 @@ abstract class CombineWorker {
   /// {@template combine_worker_initialize}
   /// Initializes worker.
   ///
-  /// Worker manager can be lazy initialized on first execution
-  /// so you don't have to call this method.
+  /// Worker manager can be lazily initialized on the first execution,
+  /// so you can omit calling `initialize`.
   ///
-  /// To initialize worker with custom isolates count use [isolatesCount] parameter.
-  /// Default value is calculated by this formula:
+  /// To initialize worker with a custom amount of isolates, use the
+  /// [isolatesCount] parameter.
+  /// Default value is calculated by the following formula:
   /// `max(1, (numberOfProcessors / 2).floor())`
-  /// You shouldn't create just `numberOfProcessors` isolates because
-  /// flutter uses 3 threads: dart main, native main and gpu.
+  /// Please keep in mind that Flutter already uses 3 threads:
+  /// Dart main, native main and GPU. So your [isolatesCount] should be less
+  /// than `numberOfProcessors - 3`.
   ///
-  /// Each isolate can execute one or more tasks asynchronously (thanks to async io and event loop).
+  /// Each isolate can execute one or more tasks asynchronously
+  /// (thanks to async IO and event loop).
   /// [tasksPerIsolate] parameter is used to set maximum number of tasks that
   /// one isolate can perform asynchronously.
   /// {@endtemplate}
@@ -51,7 +54,7 @@ abstract class CombineWorker {
   /// {@endtemplate}
   ///
   /// {@template combine_worker_execute_exception}
-  /// This future may completes with [CombineWorkerClosedException] if you
+  /// This future may complete with [CombineWorkerClosedException] if you
   /// [close] worker with `waitForRemainingTasks` flag set to `false`.
   /// {@endtemplate}
   Future<T> execute<T>(Task<T> task);
@@ -75,17 +78,17 @@ abstract class CombineWorker {
   );
 
   /// {@template combine_worker_close}
-  /// Closes current Worker.
+  /// Closes the current Worker.
   /// [CombineWorker] is a singleton but under the hood it uses a worker manager instance
-  /// which can be closed and recreated. It may be useful if you want to cancel 
-  /// all running and awaiting tasks. For example on user logout.
+  /// which can be closed and recreated. It may be useful if you want to cancel
+  /// all running and awaiting tasks (i. e. on user logout).
   ///
   /// If `waitForRemainingTasks` flag is set to `true` then
-  /// worker will be marked as closed but will finish all it's tasks.
+  /// worker will be marked as closed but will finish all its tasks.
   /// Otherwise all remaining tasks will complete with [CombineWorkerClosedException].
   ///
-  /// You can call execute or [initialize] methods without awaiting for this future.
-  /// In that case new isolates pool will be created.
+  /// You can call [execute] or [initialize] methods without awaiting for this future.
+  /// In that case new isolates' pool will be created.
   /// {@endtemplate}
   Future<void> close({bool waitForRemainingTasks = false});
 }

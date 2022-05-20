@@ -67,9 +67,9 @@ isolateInfo.messenger
 
 `CombineWorker` is a pool of Isolates that efficiently executes tasks in them.
 
-In compare to fluter's `compute` method that creates isolate each time
-when it is called Combine Worker creates a pool of isolates and efficiently
-reuse them. 
+In comparison to Fluter's [compute] method which creates an isolate each time
+it is called, Combine Worker creates a pool of isolates and efficiently
+reuses them.
 ```dart
 final fibonacciNumber = CombineWorker().executeWithArg(calculateFibonacci, 42);
 print(fibonacciNumber); // 1655801441
@@ -88,8 +88,9 @@ int calculateFibonacci(int number) {
 
 #### Create
 
-`CombineIsolate` is just a representation of `Isolate` so when you create a CombineIsolate
-Isolate will be created under the hood except web platform.
+`CombineIsolate` is just a representation of `Isolate` so when you create a CombineIsolate,
+an Isolate will be created under the hood. On the web, however, everything will be executed 
+on the main isolate.
 
 To create a new CombineIsolate you just need to call `Combine().spawn(entryPointFunction)`.
 `entryPointFunction` is a function which will be called in Isolate.
@@ -196,14 +197,14 @@ Explanation:
 ### Initialize worker
 
 To initialize worker you may call `CombineWorker().initialize()` however 
-it can be lazy initialized on first execution so you don't have to call this method.
+it can be lazily initialized on the first execution so you omit calling this method.
 
-Also this method has `isolatesCount` and `tasksPerIsolate` parameters. Second parameter 
+Also this method has `isolatesCount` and `tasksPerIsolate` parameters. The second parameter 
 is used to set maximum number of tasks that one isolate can perform asynchronously.
 
 ### Execute tasks
 
-You can execute task with zero, one or two argument using `execute`, `executeWithArg`
+You can execute task with zero, one or two arguments using `execute`, `executeWithArg`
 and `executeWith2Args` methods accordingly.
 
 ```dart
@@ -219,21 +220,21 @@ String oneArgFunction(String str) => str;
 String twoArgsFunction(String a, String b) => "$a, $b";
 ```
 
-If some task will throw exception corresponding execute function 
-will be completed with this exception.
+If some task will throw an exception, corresponding execute function 
+will completes with this exception.
 
 ### Close Worker
 
-`CombineWorker().close()` method is used to close current worker.\
+`CombineWorker().close()` method is used to close the current worker.\
 `CombineWorker` is a singleton but under the hood it uses a worker manager instance
 which can be closed and recreated. It may be useful if you want to cancel 
-all running and awaiting tasks. For example on user logout.
+all running and awaiting tasks (i. e. on user logout).
 
 When worker is closed it completes all tasks with `CombineWorkerClosedException`.\
 If you want to wait for remaining tasks set `waitForRemainingTasks` parameter to `true`.
 In that case they won't be completed with exception. 
 
-You can call execute or `initialize` methods without awaiting for this future.
+You can call `execute` or `initialize` methods without awaiting for this future.
 In that case new worker manager will be created.
 
 ## Limitations
@@ -258,17 +259,17 @@ so it is very unlikely that you will face this problem.
 ### Closure variables
 
 Isolate `entryPoint` function for `spawn` method or `task` function for `execute` methods 
-may be a top level.\
+may be a first-level, as well as a static or top-level.\
 Also it may use closure variables but with some restrictions:
- - closure variable will be copped (as every variable passed to isolate)
+ - closure variable will be copied (as every variable passed to isolate)
    so it won't be synchronized across Isolates.
- - if you will use at least one variable from closure all closure variables
+ - if you use at least one variable from closure all closure variables
    will be copied to the Isolate due to this [issue](https://github.com/dart-lang/sdk/issues/36983).
-   It can lead to the high memory consumption or event exception because
+   It can lead to high memory consumption or event exception because
    some variables may contains native resources.
 
-Due to the above points I highly recommend you not to use closure variables
-while issue is not fixed.
+Due to above points I highly recommend you to avoid using closure variables,
+until this issue is fixed.
 
 # Additional information
 
