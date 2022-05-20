@@ -6,6 +6,7 @@
   `CombineInfo` which holds `CombineIsolate` and `IsolateMessenger`.
 - Return `IsolateMessenger` from `CombineIsolate`.
 - Add `CombineIsolate` to the `IsolateContext` class.
+- Update README
 
 ## 0.1.2
 - Export isolate factories

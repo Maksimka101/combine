@@ -76,6 +76,9 @@ abstract class CombineWorker {
 
   /// {@template combine_worker_close}
   /// Closes current Worker.
+  /// [CombineWorker] is a singleton but under the hood it uses a worker manager instance
+  /// which can be closed and recreated. It may be useful if you want to cancel 
+  /// all running and awaiting tasks. For example on user logout.
   ///
   /// If `waitForRemainingTasks` flag is set to `true` then
   /// worker will be marked as closed but will finish all it's tasks.

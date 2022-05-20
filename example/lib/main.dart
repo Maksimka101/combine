@@ -150,6 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _onCalculateAllFibNumbers() {
+    _calculatedFibonacciValues.clear();
     for (var i = 0; i < _counter; i++) {
       CombineWorker().executeWithArg(calculateFibonacci, i).then(
         (value) {
