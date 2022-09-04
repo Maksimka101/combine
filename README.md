@@ -1,3 +1,5 @@
+![Combine logo](assets/combine_logo.png)
+
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-purple.svg" alt="License: MIT"></a>
 <a href="https://pub.dev/packages/combine"><img src="https://img.shields.io/pub/v/combine.svg" alt="Pub"></a>
 <a href="https://codecov.io/gh/Maksimka101/combine">
@@ -8,6 +10,8 @@
 This plugin **Combines** Isolate, MethodChannel and Thread Pool. \
 In other words it provides a way to use flutter plugins in `Isolate`
 or just work with user friendly API for Isolates.
+
+**Learn more in [this](https://maksimka101.github.io/docusaurus-blog/blog/combine/) article!**
 
 # Features
 
@@ -67,7 +71,7 @@ isolateInfo.messenger
 
 `CombineWorker` is a pool of Isolates that efficiently executes tasks in them.
 
-In comparison to Fluter's [compute] method which creates an isolate each time
+In comparison to Fluter's `compute` method which creates an isolate each time
 it is called, Combine Worker creates a pool of isolates and efficiently
 reuses them.
 ```dart
@@ -257,27 +261,17 @@ almost always firstly you send some data to this channel
 so it is very unlikely that you will face this problem.
 
 ### Closure variables
+Isolate `entryPoint` function for `spawn` method or `task` function for the `execute` methods 
+may be a first-level, as well as a static or top-level.
 
-Isolate `entryPoint` function for `spawn` method or `task` function for `execute` methods 
-may be a first-level, as well as a static or top-level.\
-Also it may use closure variables but with some restrictions:
+Also, it may use closure variables but with some restrictions:
  - closure variable will be copied (as every variable passed to isolate)
    so it won't be synchronized across Isolates.
  - if you use at least one variable from closure all closure variables
    will be copied to the Isolate due to this [issue](https://github.com/dart-lang/sdk/issues/36983).
    It can lead to high memory consumption or event exception because
-   some variables may contains native resources.
+   some variables may contain native resources.
 
-Due to above points I highly recommend you to avoid using closure variables,
+Due to the above points, I highly recommend you avoid using closure variables
 until this issue is fixed.
 
-# Additional information
-
-[Method Channel limitation](#method-channel) may be fixed by some cool hacks and I'll try to do it later.
-
-Also as you might have noticed this package is in beta version. \
-So firstly it means that API may be changed. \
-Secondly it means that I need to do a lot of things so I need your help. If you like this package
-please like and star it! If you have something to say please create an issue! \
-I want to know that this package can help someone. It will give me the strength to continue
-working on it :)

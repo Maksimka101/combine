@@ -1,3 +1,9 @@
+## 0.2.0+1
+- Update readme
+  - Add logo image
+  - Add link to the article
+  - Fix typos
+
 ## 0.2.0
 - Introduce `CombineWorker` which is a pool of [CombineIsolate]s that
   efficiently executes tasks in them.
