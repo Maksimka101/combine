@@ -10,15 +10,18 @@ import 'worker_tasks/one_arg_tasks.dart';
 import 'worker_tasks/two_args_tasks.dart';
 
 void main() {
-  group("Test with native worker factory", () {
-    late CombineWorker combineWorker;
+  late CombineWorker combineWorker;
 
+  setUp(() {
+    combineWorker = CombineWorkerImpl();
+  });
+  tearDown(() => combineWorker.close());
+
+  group("Test with native worker factory", () {
     setUp(() {
       setTestWorkerFactory(NativeWorkerManagerFactory());
-      combineWorker = CombineWorkerImpl();
     });
 
-    tearDown(() => combineWorker.close());
     tearDownAll(clearWorkerFactory);
 
     commonWorkerTest();
@@ -73,10 +76,14 @@ void main() {
         );
 
         final initializerIsCalled = await combineWorker.execute(
-          ensureInitializerIsCalledTask,
+          initializerIsCalledTask,
+        );
+        final calledOnce = await combineWorker.execute(
+          ensureInitializerIsCalledOnceTask,
         );
 
         expect(initializerIsCalled, isTrue);
+        expect(calledOnce, isTrue);
       });
 
       test("initializer function is executed in the each Isolate", () async {
@@ -90,7 +97,7 @@ void main() {
         final tasksResult = await Future.wait([
           for (var i = 0; i < isolatesCount * 4; i++)
             combineWorker.execute(
-              ensureInitializerIsCalledTask,
+              initializerIsCalledTask,
             ),
         ]);
         expect(tasksResult.every((result) => result), isTrue);
@@ -106,6 +113,18 @@ void main() {
     tearDownAll(clearWorkerFactory);
 
     commonWorkerTest();
+
+    group("Test 'initializer' parameter for the 'initialize' method", () {
+      test("'initializer' is called", () async {
+        await combineWorker.initialize(
+          isolatesCount: 1,
+          initializer: workerInitializer,
+        );
+
+        expect(initializerIsCalledTask(), isTrue);
+        expect(ensureInitializerIsCalledOnceTask(), isTrue);
+      });
+    });
   });
 
   test("'effectiveWorkerFactory' returns Native factory", () {
