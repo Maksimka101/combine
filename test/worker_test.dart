@@ -4,6 +4,7 @@ import 'package:combine/combine.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'utils/test_async_widgets.dart';
+import 'worker_tasks/initializer_tasks.dart';
 import 'worker_tasks/no_args_tasks.dart';
 import 'worker_tasks/one_arg_tasks.dart';
 import 'worker_tasks/two_args_tasks.dart';
@@ -62,6 +63,38 @@ void main() {
           expect(exception, isA<CombineWorkerClosedException>());
         },
       );
+    });
+
+    group("Test 'initializer' parameter for the 'initialize' method", () {
+      test("initializer function is executed in the single Isolate", () async {
+        await combineWorker.initialize(
+          isolatesCount: 1,
+          initializer: workerInitializer,
+        );
+
+        final initializerIsCalled = await combineWorker.execute(
+          ensureInitializerIsCalledTask,
+        );
+
+        expect(initializerIsCalled, isTrue);
+      });
+
+      test("initializer function is executed in the each Isolate", () async {
+        const isolatesCount = 4;
+        await combineWorker.initialize(
+          isolatesCount: isolatesCount,
+          tasksPerIsolate: 1,
+          initializer: workerInitializer,
+        );
+
+        final tasksResult = await Future.wait([
+          for (var i = 0; i < isolatesCount * 4; i++)
+            combineWorker.execute(
+              ensureInitializerIsCalledTask,
+            ),
+        ]);
+        expect(tasksResult.every((result) => result), isTrue);
+      });
     });
   });
 

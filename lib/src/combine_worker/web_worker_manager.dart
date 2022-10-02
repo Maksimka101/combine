@@ -1,11 +1,14 @@
 import 'dart:async';
 
-import 'package:combine/src/combine_worker/combine_worker_manager.dart';
-import 'package:combine/src/combine_worker/tasks.dart';
+import 'package:combine/combine.dart';
 
 class WebWorkerManager extends CombineWorkerManager {
   @override
-  Future<void> initialize() async {}
+  Future<void> initialize({
+    WorkerInitializer? initializer,
+  }) async {
+    initializer?.call();
+  }
 
   @override
   Future<T> execute<T>(ExecutableTask<T> task) async {

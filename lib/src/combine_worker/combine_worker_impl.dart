@@ -16,6 +16,7 @@ class CombineWorkerImpl implements CombineWorker {
   Future<void> initialize({
     int? isolatesCount,
     int tasksPerIsolate = defaultTasksPerIsolate,
+    WorkerInitializer? initializer,
   }) async {
     assert(
       isolatesCount == null || isolatesCount > 0,
@@ -36,7 +37,7 @@ class CombineWorkerImpl implements CombineWorker {
       tasksPerIsolate: tasksPerIsolate,
       isolatesCount: isolatesCount,
     );
-    await _effectiveWorkerManager.initialize();
+    await _effectiveWorkerManager.initialize(initializer: initializer);
   }
 
   /// {@macro combine_worker_execute}
