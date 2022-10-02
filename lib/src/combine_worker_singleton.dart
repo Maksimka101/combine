@@ -23,7 +23,11 @@ const defaultTasksPerIsolate = 2;
 abstract class CombineWorker {
   /// {@macro combine_worker_singleton}
   factory CombineWorker() => _instance;
-  static late final _instance = CombineWorkerImpl();
+
+  /// Creates a new instance of the [CombineWorker].
+  factory CombineWorker.newInstance() => CombineWorkerImpl();
+
+  static late final _instance = CombineWorker.newInstance();
 
   /// {@template combine_worker_initialize}
   /// Initializes worker.
@@ -43,10 +47,14 @@ abstract class CombineWorker {
   /// (thanks to async IO and event loop).
   /// [tasksPerIsolate] parameter is used to set maximum number of tasks that
   /// one isolate can perform asynchronously.
+  ///
+  /// [initializer] is a function that will be executed in the each worker
+  /// isolate. It can be used to initialize something in the worker isolate.
   /// {@endtemplate}
   Future<void> initialize({
     int? isolatesCount,
     int tasksPerIsolate = defaultTasksPerIsolate,
+    WorkerInitializer? initializer,
   });
 
   /// {@template combine_worker_execute}
@@ -93,12 +101,15 @@ abstract class CombineWorker {
   Future<void> close({bool waitForRemainingTasks = false});
 }
 
+/// Typedef for the function that will be executed in the each worker isolate.
+typedef WorkerInitializer = FutureOr<void> Function();
+
 class CombineWorkerClosedException implements Exception {
   @override
   String toString() {
-    return "CombineWorker has been `close`d with `waitForRemainingTasks: false`. "
+    return "The CombineWorker has been `close`d with `waitForRemainingTasks: false`. "
         "So task can't be finished.\n"
-        "If you want to close Worker and wait for remaining tasks call "
-        "`close` function with `waitForRemainingTasks: false` parameter.";
+        "If you want to close the Worker and wait for remaining tasks call the "
+        "`close` method with the `waitForRemainingTasks: false` parameter.";
   }
 }

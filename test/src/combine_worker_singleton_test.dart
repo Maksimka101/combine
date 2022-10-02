@@ -49,6 +49,16 @@ void main() {
     expect(identical(CombineWorker(), CombineWorker()), isTrue);
   });
 
+  test("'CombineWorker.newInstance' factory creates a new instance", () {
+    final singleton = CombineWorker();
+    final firstInstance = CombineWorker.newInstance();
+    final secondInstance = CombineWorker.newInstance();
+
+    expect(identical(singleton, firstInstance), isFalse);
+    expect(identical(singleton, secondInstance), isFalse);
+    expect(identical(firstInstance, secondInstance), isFalse);
+  });
+
   test("'initialize' calls worker manager's initialize function", () async {
     await combineWorker.initialize(isolatesCount: 10);
     verifyCreated(equals(10));

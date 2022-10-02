@@ -36,6 +36,8 @@ or just work with user friendly API for Isolates.
 - [Combine Worker](#combine-worker)
   - [Initialize worker](#initialize-worker)
   - [Execute tasks](#execute-tasks)
+  - [Create a new instance](#create-a-new-instance)
+    - [Initialize worker isolates](#initialize-worker-isolates)
   - [Close Worker](#close-worker)
 - [Limitations](#limitations)
   - [Method Channel](#method-channel)
@@ -203,8 +205,10 @@ Explanation:
 To initialize worker you may call `CombineWorker().initialize()` however 
 it can be lazily initialized on the first execution so you omit calling this method.
 
-Also this method has `isolatesCount` and `tasksPerIsolate` parameters. The second parameter 
-is used to set maximum number of tasks that one isolate can perform asynchronously.
+Also this method has `isolatesCount`, `tasksPerIsolate` and `initializer` parameters.
+The second parameter is used to set maximum number of tasks that one isolate 
+can perform asynchronously. About the `initializer` parameter you can read 
+[below](#initialize-worker-isolates).
 
 ### Execute tasks
 
@@ -226,6 +230,19 @@ String twoArgsFunction(String a, String b) => "$a, $b";
 
 If some task will throw an exception, corresponding execute function 
 will completes with this exception.
+
+### Create a new instance
+
+If you want to have a few workers with different settings for the separate tasks,
+you can create a new worker instance with the `CombineWorker.newInstance` factory.
+
+#### Initialize worker isolates
+
+Sometimes you need to execute some code once worker isolate is created. For example,
+to initialize db connection, configure API client, etc. It can be done with the 
+`initializer` function parameter for the `CombineWorker.initialize()` method.\
+`initializer` is a function that will be executed in each worker isolate during 
+their creation. 
 
 ### Close Worker
 

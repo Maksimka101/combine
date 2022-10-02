@@ -4,20 +4,24 @@ import 'package:combine/combine.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'utils/test_async_widgets.dart';
+import 'worker_tasks/initializer_tasks.dart';
 import 'worker_tasks/no_args_tasks.dart';
 import 'worker_tasks/one_arg_tasks.dart';
 import 'worker_tasks/two_args_tasks.dart';
 
 void main() {
-  group("Test with native worker factory", () {
-    late CombineWorker combineWorker;
+  late CombineWorker combineWorker;
 
+  setUp(() {
+    combineWorker = CombineWorkerImpl();
+  });
+  tearDown(() => combineWorker.close());
+
+  group("Test with native worker factory", () {
     setUp(() {
       setTestWorkerFactory(NativeWorkerManagerFactory());
-      combineWorker = CombineWorkerImpl();
     });
 
-    tearDown(() => combineWorker.close());
     tearDownAll(clearWorkerFactory);
 
     commonWorkerTest();
@@ -63,6 +67,42 @@ void main() {
         },
       );
     });
+
+    group("Test 'initializer' parameter for the 'initialize' method", () {
+      test("initializer function is executed in the single Isolate", () async {
+        await combineWorker.initialize(
+          isolatesCount: 1,
+          initializer: workerInitializer,
+        );
+
+        final initializerIsCalled = await combineWorker.execute(
+          initializerIsCalledTask,
+        );
+        final calledOnce = await combineWorker.execute(
+          ensureInitializerIsCalledOnceTask,
+        );
+
+        expect(initializerIsCalled, isTrue);
+        expect(calledOnce, isTrue);
+      });
+
+      test("initializer function is executed in the each Isolate", () async {
+        const isolatesCount = 4;
+        await combineWorker.initialize(
+          isolatesCount: isolatesCount,
+          tasksPerIsolate: 1,
+          initializer: workerInitializer,
+        );
+
+        final tasksResult = await Future.wait([
+          for (var i = 0; i < isolatesCount * 4; i++)
+            combineWorker.execute(
+              initializerIsCalledTask,
+            ),
+        ]);
+        expect(tasksResult.every((result) => result), isTrue);
+      });
+    });
   });
 
   group("Test with web worker factory", () {
@@ -73,6 +113,18 @@ void main() {
     tearDownAll(clearWorkerFactory);
 
     commonWorkerTest();
+
+    group("Test 'initializer' parameter for the 'initialize' method", () {
+      test("'initializer' is called", () async {
+        await combineWorker.initialize(
+          isolatesCount: 1,
+          initializer: workerInitializer,
+        );
+
+        expect(initializerIsCalledTask(), isTrue);
+        expect(ensureInitializerIsCalledOnceTask(), isTrue);
+      });
+    });
   });
 
   test("'effectiveWorkerFactory' returns Native factory", () {

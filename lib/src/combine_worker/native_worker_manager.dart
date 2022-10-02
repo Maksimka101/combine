@@ -21,7 +21,9 @@ class NativeWorkerManager extends CombineWorkerManager {
   var _isClosed = false;
 
   @override
-  Future<void> initialize() async {
+  Future<void> initialize({
+    WorkerInitializer? initializer,
+  }) async {
     assert(
       !_initializationCompleter.isCompleted,
       "Internal error. Worker manager is initialized twice.",
@@ -32,6 +34,7 @@ class NativeWorkerManager extends CombineWorkerManager {
           CombineTaskExecutor.createExecutor(
             _tasksQueue,
             tasksPerIsolate,
+            initializer,
           ).then(_addTaskExecutor),
       ],
     );

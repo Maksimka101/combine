@@ -32,9 +32,11 @@ class CombineTaskExecutor {
   static Future<CombineTaskExecutor> createExecutor(
     Queue<TaskInfo> actionsQueue,
     int tasksPerIsolate,
+    WorkerInitializer? initializer,
   ) async {
     final combineInfo = await Combine().spawn(
       _isolateEntryPoint,
+      argument: initializer,
       errorsAreFatal: false,
     );
     return CombineTaskExecutor._(combineInfo, actionsQueue, tasksPerIsolate);
@@ -69,7 +71,12 @@ class CombineTaskExecutor {
   }
 
   static Future<void> _isolateEntryPoint(IsolateContext context) async {
+    final initializer = context.argument;
     final messenger = context.messenger;
+
+    if (initializer is WorkerInitializer) {
+      await initializer();
+    }
     await for (final request in messenger.messages) {
       if (request is _ExecutableTaskRequest) {
         late TaskResponse taskResponse;

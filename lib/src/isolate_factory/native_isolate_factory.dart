@@ -33,7 +33,6 @@ class NativeIsolateFactory extends IsolateFactory {
       ),
       debugName: debugName,
       errorsAreFatal: errorsAreFatal,
-      paused: false,
     );
 
     final receivePortStream = receivePort.asBroadcastStream().cast<Object?>();
