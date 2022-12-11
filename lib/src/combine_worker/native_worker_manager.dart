@@ -23,6 +23,7 @@ class NativeWorkerManager extends CombineWorkerManager {
   @override
   Future<void> initialize({
     WorkerInitializer? initializer,
+    required String isolatesPrefix,
   }) async {
     assert(
       !_initializationCompleter.isCompleted,
@@ -35,6 +36,7 @@ class NativeWorkerManager extends CombineWorkerManager {
             _tasksQueue,
             tasksPerIsolate,
             initializer,
+            '$isolatesPrefix-${i + 1}',
           ).then(_addTaskExecutor),
       ],
     );
@@ -61,7 +63,7 @@ class NativeWorkerManager extends CombineWorkerManager {
   /// Schedule execution.
   ///
   /// Firstly try to schedule for free executors which are not working.
-  /// Then try to schedule for wording but not busy executors.
+  /// Then try to schedule for working but not busy executors.
   void _tryToStartExecution() {
     _taskExecutors
         .where((executor) => !executor.isWorking)

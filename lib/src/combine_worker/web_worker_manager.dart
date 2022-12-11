@@ -6,6 +6,7 @@ class WebWorkerManager extends CombineWorkerManager {
   @override
   Future<void> initialize({
     WorkerInitializer? initializer,
+    required String isolatesPrefix,
   }) async {
     initializer?.call();
   }

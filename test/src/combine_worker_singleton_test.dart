@@ -18,7 +18,11 @@ void main() {
 
     registerFallbackValue(ExecutableTaskFake<String>());
 
-    when(combineWorkerManager.initialize).thenAnswer((_) async {});
+    when(
+      () => combineWorkerManager.initialize(
+        isolatesPrefix: any(named: 'isolatesPrefix'),
+      ),
+    ).thenAnswer((_) async {});
     when(
       () => combineWorkerManagerFactory.create(
         isolatesCount: any(named: 'isolatesCount'),

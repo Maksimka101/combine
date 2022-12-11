@@ -1,5 +1,5 @@
 import 'package:combine/combine.dart';
-import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -69,11 +69,16 @@ class IncrementEvent {}
 
 class DecrementEvent {}
 
-class CounterInfoEvent extends Equatable {
+@immutable
+class CounterInfoEvent {
   const CounterInfoEvent(this.count);
 
   final int count;
 
   @override
-  List<Object?> get props => [count];
+  int get hashCode => count.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      other is CounterInfoEvent && other.count == count;
 }

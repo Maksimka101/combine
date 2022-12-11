@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:combine/combine.dart';
@@ -103,6 +104,45 @@ void main() {
         expect(tasksResult.every((result) => result), isTrue);
       });
     });
+
+    group("'UnsupportedIsolateArgumentError'", () {
+      testAsyncWidgets(
+        'is thrown when sending unsupported object to the isolate',
+        (_) async {
+          Object? exception;
+          try {
+            await combineWorker.executeWithArg(
+              unsupportedArgumentTask,
+              UserTag(""),
+            );
+          } catch (e) {
+            exception = e;
+            exception.toString();
+          }
+          expect(
+            exception,
+            isA<UnsupportedIsolateArgumentError>(),
+          );
+        },
+      );
+
+      testAsyncWidgets(
+        'is thrown when sending unsupported object from the isolate',
+        (_) async {
+          await expectLater(
+            combineWorker.executeWithArg(
+              unsupportedArgumentTask,
+              Object(),
+            ),
+            throwsA(isA<UnsupportedIsolateArgumentError>()),
+          );
+        },
+      );
+    });
+
+    testAsyncWidgets('test isolate prefix', (_) async {
+      await combineWorker.initialize(isolatesPrefix: 'prefix-test');
+    });
   });
 
   group("Test with web worker factory", () {
@@ -166,7 +206,7 @@ void commonWorkerTest() {
 
     testAsyncWidgets("with throw exception task", (_) async {
       await expectLater(
-        () => combineWorker.execute(throwExceptionTask),
+        combineWorker.execute(throwExceptionTask),
         throwsException,
       );
     });
@@ -206,6 +246,114 @@ void commonWorkerTest() {
       );
 
       expect(result, firstNum + secondNum);
+    });
+  });
+
+  group("Test 'executeWith3Args'", () {
+    testAsyncWidgets("with add three numbers task", (_) async {
+      const firstNum = 4;
+      const secondNum = 8;
+      const thirdNum = 1;
+
+      final result = await combineWorker.executeWith3Args(
+        addThreeNumbers,
+        firstNum,
+        secondNum,
+        thirdNum,
+      );
+
+      expect(result, firstNum + secondNum + thirdNum);
+    });
+  });
+
+  group("Test 'executeWith4Args'", () {
+    testAsyncWidgets("with add four numbers task", (_) async {
+      const firstNum = 4;
+      const secondNum = 8;
+      const thirdNum = 1;
+      const fourthNum = 2;
+
+      final result = await combineWorker.executeWith4Args(
+        addFourNumbers,
+        firstNum,
+        secondNum,
+        thirdNum,
+        fourthNum,
+      );
+
+      expect(result, firstNum + secondNum + thirdNum + fourthNum);
+    });
+  });
+
+  group("Test 'executeWith5Args'", () {
+    testAsyncWidgets("with add five numbers task", (_) async {
+      const firstNum = 4;
+      const secondNum = 8;
+      const thirdNum = 1;
+      const fourthNum = 2;
+      const fifthNum = 7;
+
+      final result = await combineWorker.executeWith5Args(
+        addFiveNumbers,
+        firstNum,
+        secondNum,
+        thirdNum,
+        fourthNum,
+        fifthNum,
+      );
+
+      expect(result, firstNum + secondNum + thirdNum + fourthNum + fifthNum);
+    });
+  });
+
+  group("Test 'executeWithApply'", () {
+    testAsyncWidgets("with 'voidOneArgTask'", (tester) async {
+      await combineWorker.executeWithApply<void>(
+        voidOneArgTask,
+        [Object()],
+      );
+    });
+
+    testAsyncWidgets("with 'valueTask'", (tester) async {
+      const value = "value";
+
+      final result = await combineWorker.executeWithApply<String>(
+        valueTask,
+        [value],
+      );
+
+      expect(result, value);
+    });
+
+    testAsyncWidgets("with 'constTask'", (tester) async {
+      final response = await combineWorker.executeWithApply<String>(
+        constTask,
+        [],
+      );
+
+      expect(response, constVoidTaskValue);
+    });
+
+    testAsyncWidgets("with 'addThreeNumbersNamed'", (_) async {
+      const firstNum = 4;
+      const secondNum = 8;
+      const thirdNum = 1;
+
+      final firstResponse = await combineWorker.executeWithApply(
+        addThreeNumbersNamed,
+        [firstNum],
+        {#second: secondNum},
+      );
+
+      expect(firstResponse, firstNum + secondNum);
+
+      final secondResponse = await combineWorker.executeWithApply(
+        addThreeNumbersNamed,
+        [firstNum],
+        {#second: secondNum, #third: thirdNum},
+      );
+
+      expect(secondResponse, firstNum + secondNum + thirdNum);
     });
   });
 }

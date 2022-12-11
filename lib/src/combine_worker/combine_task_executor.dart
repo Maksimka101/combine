@@ -33,11 +33,13 @@ class CombineTaskExecutor {
     Queue<TaskInfo> actionsQueue,
     int tasksPerIsolate,
     WorkerInitializer? initializer,
+    String debugName,
   ) async {
     final combineInfo = await Combine().spawn(
       _isolateEntryPoint,
       argument: initializer,
       errorsAreFatal: false,
+      debugName: debugName,
     );
     return CombineTaskExecutor._(combineInfo, actionsQueue, tasksPerIsolate);
   }
@@ -62,12 +64,16 @@ class CombineTaskExecutor {
   }
 
   Future<void> _sendMessageAndReceiveResponse(TaskInfo taskInfo) async {
-    final taskId = _idGenerator();
-    _isolateMessenger.send(_ExecutableTaskRequest(taskId, taskInfo.task));
-    final response = await _isolateMessenger.messages.firstWhere(
-      (msg) => msg is _ExecutableTaskResponse && msg.taskId == taskId,
-    ) as _ExecutableTaskResponse;
-    response.taskResponse.complete(taskInfo.resultCompleter);
+    try {
+      final taskId = _idGenerator();
+      _isolateMessenger.send(_ExecutableTaskRequest(taskId, taskInfo.task));
+      final response = await _isolateMessenger.messages.firstWhere(
+        (msg) => msg is _ExecutableTaskResponse && msg.taskId == taskId,
+      ) as _ExecutableTaskResponse;
+      response.taskResponse.complete(taskInfo.resultCompleter);
+    } catch (error, stackTrace) {
+      taskInfo.resultCompleter.completeError(error, stackTrace);
+    }
   }
 
   static Future<void> _isolateEntryPoint(IsolateContext context) async {
@@ -85,7 +91,16 @@ class CombineTaskExecutor {
         } catch (error, stackTrace) {
           taskResponse = TaskErrorResponse(error, stackTrace);
         }
-        messenger.send(_ExecutableTaskResponse(request.taskId, taskResponse));
+        try {
+          messenger.send(_ExecutableTaskResponse(request.taskId, taskResponse));
+        } catch (error, stackTrace) {
+          messenger.send(
+            _ExecutableTaskResponse(
+              request.taskId,
+              TaskErrorResponse(error, stackTrace),
+            ),
+          );
+        }
       }
     }
   }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:isolate';
 
 import 'package:combine/src/combine_isolate/combine_isolate.dart';
 import 'package:combine/src/combine_singleton.dart';
@@ -7,6 +8,7 @@ import 'package:combine/src/combine_worker/tasks.dart';
 import 'package:flutter/foundation.dart';
 
 const defaultTasksPerIsolate = 2;
+const defaultIsolatePrefix = 'combine-worker';
 
 /// {@template combine_worker_singleton}
 /// Combine Worker is a pool of [CombineIsolate]s that efficiently executes
@@ -50,11 +52,15 @@ abstract class CombineWorker {
   ///
   /// [initializer] is a function that will be executed in the each worker
   /// isolate. It can be used to initialize something in the worker isolate.
+  ///
+  /// [isolatesPrefix] will be used to set isolates debug name. Debug name will
+  /// be visible in the debugger.
   /// {@endtemplate}
   Future<void> initialize({
     int? isolatesCount,
     int tasksPerIsolate = defaultTasksPerIsolate,
     WorkerInitializer? initializer,
+    String isolatesPrefix = defaultIsolatePrefix,
   });
 
   /// {@template combine_worker_execute}
@@ -62,8 +68,12 @@ abstract class CombineWorker {
   /// {@endtemplate}
   ///
   /// {@template combine_worker_execute_exception}
-  /// This future may complete with [CombineWorkerClosedException] if you
-  /// [close] worker with `waitForRemainingTasks` flag set to `false`.
+  /// This future may complete with:
+  /// - [CombineWorkerClosedException] if you [close] worker
+  ///   with `waitForRemainingTasks` flag set to `false`.
+  /// - [UnsupportedIsolateArgumentError] if you send to/from isolate
+  ///   some unsupported object like [ReceivePort].
+  /// - an original exception thrown by the [task].
   /// {@endtemplate}
   Future<T> execute<T>(Task<T> task);
 
@@ -80,10 +90,72 @@ abstract class CombineWorker {
   ///
   /// {@macro combine_worker_execute_exception}
   Future<T> executeWith2Args<T, Q, C>(
-    Task3<T, Q, C> task,
+    Task2<T, Q, C> task,
     Q argument,
     C argument2,
   );
+
+  /// {@template combine_worker_execute_with_multiple_args}
+  /// Executes given [task] with given arguments in combine isolate.
+  /// {@endtemplate}
+  ///
+  /// {@macro combine_worker_execute_exception}
+  Future<T> executeWith3Args<T, Q, C, A>(
+    Task3<T, Q, C, A> task,
+    Q argument,
+    C argument2,
+    A argument3,
+  );
+
+  /// {@template combine_worker_execute_with_multiple_args}
+  /// Executes given [task] with given arguments in combine isolate.
+  /// {@endtemplate}
+  ///
+  /// {@macro combine_worker_execute_exception}
+  Future<T> executeWith4Args<T, Q, C, A, B>(
+    Task4<T, Q, C, A, B> task,
+    Q argument,
+    C argument2,
+    A argument3,
+    B argument4,
+  );
+
+  /// {@template combine_worker_execute_with_multiple_args}
+  /// Executes given [task] with given arguments in combine isolate.
+  /// {@endtemplate}
+  ///
+  /// {@macro combine_worker_execute_exception}
+  Future<T> executeWith5Args<T, Q, C, A, B, D>(
+    Task5<T, Q, C, A, B, D> task,
+    Q argument,
+    C argument2,
+    A argument3,
+    B argument4,
+    D argument5,
+  );
+
+  /// {@template combine_worker_execute_with_multiple_args}
+  /// Dynamically execute [task] with the specified arguments in combine isolate
+  /// It works like [Function.apply].
+  ///
+  /// Acts the same as calling function with positional arguments
+  /// corresponding to the elements of [positionalArguments] and
+  /// named arguments corresponding to the elements of [namedArguments].
+  ///
+  /// This includes giving the same errors if [task] isn't callable or
+  /// if it expects different parameters.
+  ///
+  /// Don't use this method while you can use [executeWith5Args],
+  /// [executeWith4Args], [executeWith3Args] etc.
+  /// These methods are typesafe unlike [executeWithApply].
+  /// {@endtemplate}
+  ///
+  /// {@macro combine_worker_execute_exception}
+  Future<T> executeWithApply<T>(
+    TaskApply task,
+    List<dynamic> positionalArguments, [
+    Map<Symbol, dynamic>? namedArguments,
+  ]);
 
   /// {@template combine_worker_close}
   /// Closes the current Worker.
@@ -112,4 +184,19 @@ class CombineWorkerClosedException implements Exception {
         "If you want to close the Worker and wait for remaining tasks call the "
         "`close` method with the `waitForRemainingTasks: false` parameter.";
   }
+}
+
+/// This exception is thrown when when you send to/from isolate some unsupported data like [ReceivePort].
+class UnsupportedIsolateArgumentError extends ArgumentError {
+  UnsupportedIsolateArgumentError(this.originalError);
+
+  final ArgumentError originalError;
+
+  /// Name of the invalid argument, if available.
+  @override
+  String? get name => originalError.name;
+
+  /// Message describing the problem.
+  @override
+  dynamic get message => originalError.message;
 }

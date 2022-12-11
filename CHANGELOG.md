@@ -1,3 +1,13 @@
+## 0.4.0
+- Add a few execute methods:
+  - `executeWith3Args`, `executeWith4Args` and `executeWith5Args`. 
+    They work like existing `executeWithArg` and `executeWith3Args`.
+  - `executeWithApply`. This method works like the `Function.apply` method.
+- Improve errors catching and add `UnsupportedIsolateArgumentError` that can be thrown by:
+  - `IsolateMessenger.send` method.
+  - any execute methods.
+- Update readme.
+
 ## 0.3.0
 - Add the `CombineWorker.newInstance` factory. It can be used to create a new instance
   of the `CombineWorker`.

@@ -10,6 +10,7 @@ abstract class CombineWorkerManager {
   /// Initializes worker manager by creating [isolatesCount] [CombineIsolate]s.
   Future<void> initialize({
     WorkerInitializer? initializer,
+    required String isolatesPrefix,
   });
 
   Future<T> execute<T>(ExecutableTask<T> task);

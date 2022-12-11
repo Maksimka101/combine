@@ -17,6 +17,7 @@ class CombineWorkerImpl implements CombineWorker {
     int? isolatesCount,
     int tasksPerIsolate = defaultTasksPerIsolate,
     WorkerInitializer? initializer,
+    String isolatesPrefix = defaultIsolatePrefix,
   }) async {
     assert(
       isolatesCount == null || isolatesCount > 0,
@@ -37,7 +38,10 @@ class CombineWorkerImpl implements CombineWorker {
       tasksPerIsolate: tasksPerIsolate,
       isolatesCount: isolatesCount,
     );
-    await _effectiveWorkerManager.initialize(initializer: initializer);
+    await _effectiveWorkerManager.initialize(
+      initializer: initializer,
+      isolatesPrefix: isolatesPrefix,
+    );
   }
 
   /// {@macro combine_worker_execute}
@@ -55,7 +59,7 @@ class CombineWorkerImpl implements CombineWorker {
   /// {@macro combine_worker_execute_with_2_args}
   @override
   Future<T> executeWith2Args<T, Q, C>(
-    Task3<T, Q, C> action,
+    Task2<T, Q, C> action,
     Q argument,
     C argument2,
   ) {
@@ -77,8 +81,66 @@ class CombineWorkerImpl implements CombineWorker {
     return closeResult;
   }
 
+  @override
+  Future<T> executeWith3Args<T, Q, C, A>(
+    Task3<T, Q, C, A> task,
+    Q argument,
+    C argument2,
+    A argument3,
+  ) {
+    return _effectiveWorkerManager.execute(
+      TaskWith3Args(task, argument, argument2, argument3),
+    );
+  }
+
+  @override
+  Future<T> executeWith4Args<T, Q, C, A, B>(
+    Task4<T, Q, C, A, B> task,
+    Q argument,
+    C argument2,
+    A argument3,
+    B argument4,
+  ) {
+    return _effectiveWorkerManager.execute(
+      TaskWith4Args(task, argument, argument2, argument3, argument4),
+    );
+  }
+
+  @override
+  Future<T> executeWith5Args<T, Q, C, A, B, D>(
+    Task5<T, Q, C, A, B, D> task,
+    Q argument,
+    C argument2,
+    A argument3,
+    B argument4,
+    D arguments5,
+  ) {
+    return _effectiveWorkerManager.execute(
+      TaskWith5Args(
+        task,
+        argument,
+        argument2,
+        argument3,
+        argument4,
+        arguments5,
+      ),
+    );
+  }
+
+  @override
+  Future<T> executeWithApply<T>(
+    TaskApply task,
+    List? positionalArguments, [
+    Map<Symbol, dynamic>? namedArguments,
+  ]) {
+    return _effectiveWorkerManager.execute(
+      TaskWithApplyArgs(task, positionalArguments, namedArguments),
+    );
+  }
+
   CombineWorkerManager _createCombineWorkerManager() {
     _isInitialized = true;
-    return effectiveWorkerFactory.create()..initialize();
+    return effectiveWorkerFactory.create()
+      ..initialize(isolatesPrefix: defaultIsolatePrefix);
   }
 }

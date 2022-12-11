@@ -1,5 +1,6 @@
 import 'dart:isolate';
 
+import 'package:combine/combine.dart';
 import 'package:combine/src/isolate_messenger/internal_isolate_messenger/internal_isolate_messenger.dart';
 
 class NativeInternalIsolateMessenger extends InternalIsolateMessenger {
@@ -15,6 +16,10 @@ class NativeInternalIsolateMessenger extends InternalIsolateMessenger {
     if (isClosed) {
       throw IsolateClosedException();
     }
-    sendPort.send(message);
+    try {
+      sendPort.send(message);
+    } on ArgumentError catch (e, st) {
+      throw Error.throwWithStackTrace(UnsupportedIsolateArgumentError(e), st);
+    }
   }
 }

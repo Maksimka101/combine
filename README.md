@@ -212,8 +212,9 @@ can perform asynchronously. About the `initializer` parameter you can read
 
 ### Execute tasks
 
-You can execute task with zero, one or two arguments using `execute`, `executeWithArg`
-and `executeWith2Args` methods accordingly.
+You can execute task with from zero to five positional arguments using `execute`, 
+`executeWithArg`, `executeWith2Args`, `executeWith3Args`, `executeWith4Args` 
+and `executeWith5Args` methods.
 
 ```dart
 final helloWorld = await CombineWorker().execute(zeroArgsFunction);
@@ -227,6 +228,23 @@ String zeroArgsFunction() => "Hello, World!";
 String oneArgFunction(String str) => str;
 String twoArgsFunction(String a, String b) => "$a, $b";
 ```
+
+Also you can execute task with any many count of positional and named arguments 
+with `executeWithApply` method. It works like `Function.apply`. 
+It takes a function to execute and a list of positional and map of named arguments.
+
+```dart
+final argumentsDescription = await CombineWorker().executeWithApply(
+  describeArgs, ["Hello"], {#namedArg: "World"},
+);
+
+String describeArgs(String arg, {required String namedArg}) {
+  return "Positional argument: $arg. Named argument: $namedArg";
+}
+```
+
+This is very powerful method, however I suggest you to use `execute`, 
+`executeWithArg`, `executeWith2Args` etc methods.
 
 If some task will throw an exception, corresponding execute function 
 will completes with this exception.
