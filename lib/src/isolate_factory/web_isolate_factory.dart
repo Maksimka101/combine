@@ -1,9 +1,7 @@
 import 'dart:async';
 
-import 'package:combine/src/combine_info.dart';
+import 'package:combine/combine.dart';
 import 'package:combine/src/combine_isolate/web_combine_isolate.dart';
-import 'package:combine/src/isolate_context.dart';
-import 'package:combine/src/isolate_factory/isolate_factory.dart';
 import 'package:combine/src/isolate_messenger/internal_isolate_messenger/web_internal_isolate_messenger.dart';
 
 class WebIsolateFactory extends IsolateFactory {
@@ -14,39 +12,52 @@ class WebIsolateFactory extends IsolateFactory {
     T? argument,
     String? debugName,
     bool errorsAreFatal = true,
+    IsolateErrorsHandler? onError,
+    ExitHandler? onExit,
   }) async {
-    // Will be closed by [WebCombineIsolate.kill].
-    // ignore: close_sinks
-    final fromIsolate = StreamController<Object?>();
-    // ignore: close_sinks
-    final toIsolate = StreamController<Object?>();
-    final toIsolateStream = toIsolate.stream.asBroadcastStream();
-    final fromIsolateStream = fromIsolate.stream.asBroadcastStream();
+    // These controllers will be closed by [WebCombineIsolate.kill].
+    final fromIsolate = StreamController.broadcast();
+    final toIsolate = StreamController.broadcast();
+    final isolateErrors = StreamController<CombineIsolateError>.broadcast();
 
     final isolateMessenger = WebInternalIsolateMessenger(
-      fromIsolateStream,
+      fromIsolate.stream,
       toIsolate.sink,
     );
 
     final context = IsolateContext(
       messenger: WebInternalIsolateMessenger(
-        toIsolateStream,
+        toIsolate.stream,
         fromIsolate.sink,
       ).toIsolateMessenger(),
       argument: argument,
-      isolate: WebCombineIsolate(() {}),
+      isolate: WebCombineIsolate(
+        () {},
+        isolateErrors.stream,
+      ),
     );
 
-    runZoned(() {
-      entryPoint(context);
-    });
+    runZonedGuarded(
+      () {
+        entryPoint(context);
+      },
+      (error, stackTrace) {
+        isolateErrors.add(CombineIsolateError(error, stackTrace));
+        onError?.call(error, stackTrace);
+      },
+    );
 
     return CombineInfo(
-      isolate: WebCombineIsolate(() {
-        fromIsolate.close();
-        toIsolate.close();
-        isolateMessenger.markAsClosed();
-      }),
+      isolate: WebCombineIsolate(
+        () {
+          fromIsolate.close();
+          toIsolate.close();
+          isolateErrors.close();
+          isolateMessenger.markAsClosed();
+          onExit?.call();
+        },
+        isolateErrors.stream,
+      ),
       messenger: isolateMessenger.toIsolateMessenger(),
     );
   }

@@ -1,17 +1,17 @@
 import 'dart:isolate';
 
 import 'package:combine/src/combine_isolate/combine_isolate.dart';
-import 'package:flutter/foundation.dart';
 
 class NativeCombineIsolate extends CombineIsolate {
-  NativeCombineIsolate(this._isolate, this.onKill);
+  NativeCombineIsolate(this.onKill, this.errors);
 
-  final Isolate _isolate;
-  final VoidCallback onKill;
+  final void Function({int priority}) onKill;
+
+  @override
+  final Stream<CombineIsolateError> errors;
 
   @override
   void kill({int priority = Isolate.beforeNextEvent}) {
     onKill();
-    _isolate.kill(priority: priority);
   }
 }

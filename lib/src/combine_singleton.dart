@@ -1,8 +1,8 @@
 import 'package:combine/src/combine_info.dart';
 import 'package:combine/src/combine_isolate/combine_isolate.dart';
 import 'package:combine/src/combine_worker_singleton.dart';
+import 'package:combine/src/isolate_context.dart';
 import 'package:combine/src/isolate_factory/effective_isolate_factory.dart';
-import 'package:combine/src/isolate_factory/isolate_factory.dart';
 import 'package:combine/src/isolate_messenger/isolate_messenger.dart';
 
 /// {@template combine_singleton}
@@ -72,12 +72,26 @@ class Combine {
     T? argument,
     bool errorsAreFatal = true,
     String? debugName = "combine_isolate",
+    IsolateErrorsHandler? onError,
+    ExitHandler? onExit,
   }) async {
     return effectiveIsolateFactory.create(
       entryPoint,
       argument: argument,
       errorsAreFatal: errorsAreFatal,
       debugName: debugName,
+      onError: onError,
+      onExit: onExit,
     );
   }
 }
+
+/// Typedef for a function which will be called in Isolate.
+typedef IsolateEntryPoint<T> = void Function(IsolateContext context);
+
+typedef IsolateErrorsHandler = void Function(
+  Object error,
+  StackTrace? stackTrace,
+);
+
+typedef ExitHandler = void Function();

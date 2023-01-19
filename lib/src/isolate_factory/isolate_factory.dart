@@ -1,4 +1,5 @@
-import 'package:combine/combine.dart';
+import 'package:combine/src/combine_info.dart';
+import 'package:combine/src/combine_singleton.dart';
 
 /// It is used to create `Isolate` and setup all necessary stuff
 /// which is needed to use method channels.
@@ -8,8 +9,7 @@ abstract class IsolateFactory {
     T? argument,
     String? debugName,
     bool errorsAreFatal = true,
+    IsolateErrorsHandler? onError,
+    ExitHandler? onExit,
   });
 }
-
-/// Typedef for a function which will be called in Isolate.
-typedef IsolateEntryPoint<T> = void Function(IsolateContext context);
