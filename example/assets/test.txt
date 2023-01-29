@@ -1,1 +1,1 @@
-Asset is loaded!
+This text is loaded from the assets!

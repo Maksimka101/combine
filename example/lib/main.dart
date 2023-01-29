@@ -112,7 +112,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             ListTile(
-              title: const Text("Loaded asset:"),
+              title: const Text("Loaded asset text:"),
               subtitle: Text(_loadedAssetString),
               onTap: _onLoadAsset,
             ),
