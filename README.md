@@ -23,7 +23,7 @@ Learn more in [this](https://maksimka101.github.io/docusaurus-blog/blog/combine/
   and then sends them to the platform. As for now, `BackgroundIsolateBinaryMessenger`
   can't be used for the `BinaryMessenger`.
   
-  What's the difference between `MethodChannel` and `BinaryMessenger`?
+  What's the difference between `MethodChannel` and `BinaryMessenger`?\
   `BinaryMessenger` is a Low-Level API for sending messages to the platform. 
   For example, it's used by the `AssetBundle` or event by the `MethodChannel` in the main Isolate.
 </details>
