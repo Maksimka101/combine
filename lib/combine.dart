@@ -1,3 +1,5 @@
+/// A Flutter package which allows you to work with MethodChannels in Isolate
+/// and provides simplified Isolate and Thread Pool API.
 library combine;
 
 export 'src/combine_info.dart';

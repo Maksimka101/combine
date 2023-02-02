@@ -6,7 +6,7 @@ abstract class IsolateEvent {
   const IsolateEvent();
 }
 
-/// Event to invoke [MethodChannel] in main isolate.
+/// Event to invoke [BinaryMessenger] in main isolate.
 @immutable
 class InvokePlatformChannelEvent extends IsolateEvent {
   const InvokePlatformChannelEvent(this.data, this.channel, this.id);
@@ -16,7 +16,7 @@ class InvokePlatformChannelEvent extends IsolateEvent {
   final int id;
 }
 
-/// Event with response from [MethodChannel]
+/// Event with response from [BinaryMessenger].
 @immutable
 class PlatformChannelResponseEvent extends IsolateEvent {
   const PlatformChannelResponseEvent(this.data, this.id);
@@ -25,20 +25,20 @@ class PlatformChannelResponseEvent extends IsolateEvent {
   final int id;
 }
 
-/// Event to invoke [MethodChannel.setMethodCallHandler] in [IsolateBloc]'s isolate.
+/// Event to invoke [BinaryMessenger.setMessageHandler] in isolate.
 @immutable
-class InvokeMethodChannelEvent extends IsolateEvent {
-  const InvokeMethodChannelEvent(this.data, this.channel, this.id);
+class InvokeBinaryMessengerChannelEvent extends IsolateEvent {
+  const InvokeBinaryMessengerChannelEvent(this.data, this.channel, this.id);
 
   final ByteData? data;
   final String channel;
   final int id;
 }
 
-/// Event with response from [MethodChannel.setMethodCallHandler] in [IsolateBloc]'s isolate.
+/// Event with response from [BinaryMessenger.setMessageHandler] in isolate.
 @immutable
-class MethodChannelResponseEvent extends IsolateEvent {
-  const MethodChannelResponseEvent(this.data, this.id);
+class BinaryMessengerResponseEvent extends IsolateEvent {
+  const BinaryMessengerResponseEvent(this.data, this.id);
 
   final ByteData? data;
   final int id;

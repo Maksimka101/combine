@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'dart:isolate';
 
+import 'package:combine/src/binary_messenger_middleware/isolated_method_channel_middleware.dart';
+import 'package:combine/src/binary_messenger_middleware/ui_binary_messenger_middleware.dart';
 import 'package:combine/src/bindings/isolate_bindings/isolate_binding.dart';
 import 'package:combine/src/combine_info.dart';
 import 'package:combine/src/combine_isolate/native_combine_isolate.dart';
 import 'package:combine/src/isolate_context.dart';
 import 'package:combine/src/isolate_factory/isolate_factory.dart';
 import 'package:combine/src/isolate_messenger/internal_isolate_messenger/native_internal_isolate_messenger.dart';
-import 'package:combine/src/method_channel_middleware/isolated_method_channel_middleware.dart';
-import 'package:combine/src/method_channel_middleware/ui_method_channel_middleware.dart';
 import 'package:flutter/services.dart';
 
 /// It is used to create [Isolate] and setup all necessary stuff
@@ -17,7 +17,6 @@ class NativeIsolateFactory extends IsolateFactory {
   @override
   Future<CombineInfo> create<T>(
     IsolateEntryPoint<T> entryPoint, {
-    Map<String, Object?>? argumentsMap,
     T? argument,
     String? debugName,
     bool errorsAreFatal = true,
@@ -28,7 +27,7 @@ class NativeIsolateFactory extends IsolateFactory {
       _IsolateSetup<T>(
         receivePort.sendPort,
         entryPoint,
-        argumentsMap,
+        RootIsolateToken.instance!,
         argument,
       ),
       debugName: debugName,
@@ -36,14 +35,14 @@ class NativeIsolateFactory extends IsolateFactory {
     );
 
     final receivePortStream = receivePort.asBroadcastStream().cast<Object?>();
-    final sendPort = await receivePortStream.first as SendPort;
+    final SendPort sendPort = await receivePortStream.first as dynamic;
 
     final isolateMessenger = NativeInternalIsolateMessenger(
       sendPort,
       receivePortStream,
     );
 
-    final methodChannelMiddleware = UIMethodChannelMiddleware(
+    final binaryMessengerMiddleware = UIBinaryMessengerMiddleware(
       ServicesBinding.instance.defaultBinaryMessenger,
       isolateMessenger,
     )..initialize();
@@ -51,7 +50,7 @@ class NativeIsolateFactory extends IsolateFactory {
       isolate: NativeCombineIsolate(
         isolate,
         () {
-          methodChannelMiddleware.dispose();
+          binaryMessengerMiddleware.dispose();
           isolateMessenger.markAsClosed();
         },
       ),
@@ -66,15 +65,17 @@ class NativeIsolateFactory extends IsolateFactory {
       receivePort.asBroadcastStream().cast<Object?>(),
     );
     isolateMessenger.send(receivePort.sendPort);
+    BackgroundIsolateBinaryMessenger.ensureInitialized(setup.isolateToken);
+    IsolatedBinaryMessengerMiddleware(isolateMessenger).initialize();
+    try {
+      IsolateBinding();
+    } catch (_) {} // Isolate binding should throw exception to skip unnecessary initialization.
 
     final isolateContext = IsolateContext(
       argument: setup.argument,
       messenger: isolateMessenger.toIsolateMessenger(),
       isolate: NativeCombineIsolate(Isolate.current, () {}),
     );
-
-    IsolatedMethodChannelMiddleware(isolateMessenger).initialize();
-    IsolateBinding();
     setup.entryPoint(isolateContext);
   }
 }
@@ -83,13 +84,13 @@ class _IsolateSetup<T> {
   _IsolateSetup(
     this.sendPort,
     this.entryPoint,
-    this.argumentsMap,
+    this.isolateToken,
     this.argument,
   );
 
   final SendPort sendPort;
   final IsolateEntryPoint<T> entryPoint;
-  final Map<String, Object?>? argumentsMap;
+  final RootIsolateToken isolateToken;
   final T? argument;
 }
 

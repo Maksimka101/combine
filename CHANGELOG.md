@@ -1,3 +1,8 @@
+## 0.5.0
+- Update `CombineIsolate` to use new Flutters `BackgroundIsolateBinaryMessenger` 
+  to work with `MethodChannel`s.
+- Internal refactoring.
+
 ## 0.4.0
 - Add a few execute methods:
   - `executeWith3Args`, `executeWith4Args` and `executeWith5Args`. 

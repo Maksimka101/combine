@@ -1,3 +1,4 @@
+import 'package:combine/src/binary_messenger_middleware/ui_binary_messenger_middleware.dart';
 import 'package:combine/src/isolate_factory/effective_isolate_factory.dart';
 import 'package:combine/src/isolate_factory/native_isolate_factory.dart';
 import 'package:combine/src/isolate_factory/web_isolate_factory.dart';
@@ -8,7 +9,9 @@ import 'combine_spawners/arguments_resend_combine_spawner.dart';
 import 'combine_spawners/counter_combine_spawners.dart';
 
 void main() {
-  setUpAll(TestWidgetsFlutterBinding.ensureInitialized);
+  setUpAll(() {
+    TestWidgetsFlutterBinding.ensureInitialized();
+  });
 
   group("Test with native isolate factory", () {
     setUpAll(() {
@@ -16,6 +19,22 @@ void main() {
     });
 
     commonCombineTest();
+
+    test(
+      'Method channel middleware and Background isolate binary messenger are initialized',
+      () async {
+        final combineInfo = await checkMethodChannelInIsolateIsInitialized();
+
+        expect(
+          UIBinaryMessengerMiddleware.uiBinaryMessengerMiddleware,
+          isNotEmpty,
+        );
+        final isolateIsInitialized = await combineInfo.messenger.messages.first;
+        expect(isolateIsInitialized, isTrue);
+
+        combineInfo.isolate.kill();
+      },
+    );
   });
 
   group("Test with web isolate factory", () {
