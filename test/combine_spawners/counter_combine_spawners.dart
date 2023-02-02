@@ -1,5 +1,5 @@
 import 'package:combine/combine.dart';
-import 'package:combine/src/method_channel_middleware/isolated_method_channel_middleware.dart';
+import 'package:combine/src/binary_messenger_middleware/isolated_method_channel_middleware.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -36,7 +36,7 @@ Future<CombineInfo> checkMethodChannelInIsolateIsInitialized() {
   return Combine().spawn((context) {
     try {
       // Test will not pass when they are not initialized (are null).
-      IsolatedMethodChannelMiddleware.instance!;
+      IsolatedBinaryMessengerMiddleware.instance!;
       BackgroundIsolateBinaryMessenger.instance;
       context.messenger.send(true);
     } catch (e) {

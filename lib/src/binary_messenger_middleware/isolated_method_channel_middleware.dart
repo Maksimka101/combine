@@ -6,22 +6,21 @@ import 'package:combine/src/isolate_events.dart';
 import 'package:combine/src/isolate_messenger/internal_isolate_messenger/internal_isolate_messenger.dart';
 import 'package:flutter/services.dart';
 
-/// This class receives messages from [MethodChannel] and sends them to the
+/// This class receives messages from [BinaryMessenger] and sends them to the
 /// UI Isolate.
-class IsolatedMethodChannelMiddleware extends BinaryMessenger {
-  /// Creates new middleware and sets [instance].
-  IsolatedMethodChannelMiddleware(this._isolateMessenger)
+class IsolatedBinaryMessengerMiddleware extends BinaryMessenger {
+  IsolatedBinaryMessengerMiddleware(this._isolateMessenger)
       : _generateId = IdGenerator();
 
   /// Last created and [initialize]d middleware.
-  static IsolatedMethodChannelMiddleware? instance;
+  static IsolatedBinaryMessengerMiddleware? instance;
 
   final InternalIsolateMessenger _isolateMessenger;
   late BinaryMessenger _binaryMessenger;
   final IdGenerator _generateId;
   final _platformResponsesCompleter = <int, Completer<ByteData?>>{};
 
-  /// Starts listening for [MethodChannelEvent]s from UI Isolate and sets middleware for [MethodChannel].
+  /// Starts listening for [IsolateEvent]s from UI Isolate and sets middleware for [BinaryMessenger].
   void initialize() {
     instance = this;
     _isolateMessenger.messagesStream
@@ -37,7 +36,7 @@ class IsolatedMethodChannelMiddleware extends BinaryMessenger {
   void _listenForMethodChannelEvents(IsolateEvent event) {
     if (event is PlatformChannelResponseEvent) {
       _platformChannelResponse(event.id, event.data);
-    } else if (event is InvokeMethodChannelEvent) {
+    } else if (event is InvokeBinaryMessengerChannelEvent) {
       _handlePlatformMessage(
         event.channel,
         event.id,
@@ -49,7 +48,7 @@ class IsolatedMethodChannelMiddleware extends BinaryMessenger {
   /// Handle platform messages and send them to it's [MessageChannel].
   void _handlePlatformMessage(String channel, int id, ByteData? message) {
     handlePlatformMessage(channel, message, (data) {
-      _isolateMessenger.send(MethodChannelResponseEvent(data, id));
+      _isolateMessenger.send(BinaryMessengerResponseEvent(data, id));
     });
   }
 

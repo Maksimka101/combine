@@ -1,9 +1,9 @@
 part of 'isolate_binding.dart';
 
-mixin _MockMethodChannelServiceBinding on ServicesBinding {
+mixin _MockBinaryMessengerServiceBinding on ServicesBinding {
   @override
   BinaryMessenger createBinaryMessenger() {
-    return IsolatedMethodChannelMiddleware.instance!
+    return IsolatedBinaryMessengerMiddleware.instance!
       ..setBinaryMessage(super.createBinaryMessenger());
   }
 

@@ -4,6 +4,7 @@ import 'package:combine/src/combine_worker_singleton.dart';
 import 'package:combine/src/isolate_factory/effective_isolate_factory.dart';
 import 'package:combine/src/isolate_factory/isolate_factory.dart';
 import 'package:combine/src/isolate_messenger/isolate_messenger.dart';
+import 'package:flutter/services.dart';
 
 /// {@template combine_singleton}
 /// [Combine] is used to [spawn] a new [CombineIsolate].
@@ -19,7 +20,8 @@ class Combine {
   /// only on first usage.
   static late final _instance = Combine._();
 
-  /// Creates a new [CombineIsolate] which is just a representation of Isolate.
+  /// Creates a new [CombineIsolate] which is just a representation of Isolate
+  /// that allows to use [MethodChannel]s and [BinaryMessenger]s in it.
   /// So when you create a [CombineIsolate], an Isolate
   /// will be created under the hood. On the web, however,
   /// [entryPoint] will be executed on the main isolate.

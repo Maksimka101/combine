@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'dart:isolate';
 
+import 'package:combine/src/binary_messenger_middleware/isolated_method_channel_middleware.dart';
+import 'package:combine/src/binary_messenger_middleware/ui_binary_messenger_middleware.dart';
 import 'package:combine/src/bindings/isolate_bindings/isolate_binding.dart';
 import 'package:combine/src/combine_info.dart';
 import 'package:combine/src/combine_isolate/native_combine_isolate.dart';
 import 'package:combine/src/isolate_context.dart';
 import 'package:combine/src/isolate_factory/isolate_factory.dart';
 import 'package:combine/src/isolate_messenger/internal_isolate_messenger/native_internal_isolate_messenger.dart';
-import 'package:combine/src/method_channel_middleware/isolated_method_channel_middleware.dart';
-import 'package:combine/src/method_channel_middleware/ui_method_channel_middleware.dart';
 import 'package:flutter/services.dart';
 
 /// It is used to create [Isolate] and setup all necessary stuff
@@ -42,7 +42,7 @@ class NativeIsolateFactory extends IsolateFactory {
       receivePortStream,
     );
 
-    final methodChannelMiddleware = UIMethodChannelMiddleware(
+    final binaryMessengerMiddleware = UIBinaryMessengerMiddleware(
       ServicesBinding.instance.defaultBinaryMessenger,
       isolateMessenger,
     )..initialize();
@@ -50,7 +50,7 @@ class NativeIsolateFactory extends IsolateFactory {
       isolate: NativeCombineIsolate(
         isolate,
         () {
-          methodChannelMiddleware.dispose();
+          binaryMessengerMiddleware.dispose();
           isolateMessenger.markAsClosed();
         },
       ),
@@ -66,7 +66,7 @@ class NativeIsolateFactory extends IsolateFactory {
     );
     isolateMessenger.send(receivePort.sendPort);
     BackgroundIsolateBinaryMessenger.ensureInitialized(setup.isolateToken);
-    IsolatedMethodChannelMiddleware(isolateMessenger).initialize();
+    IsolatedBinaryMessengerMiddleware(isolateMessenger).initialize();
     try {
       IsolateBinding();
     } catch (_) {} // Isolate binding should throw exception to skip unnecessary initialization.

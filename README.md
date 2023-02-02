@@ -11,7 +11,22 @@ This plugin **Combines** Isolate, MethodChannel and Thread Pool. \
 In other words it provides a way to use flutter plugins in `Isolate`
 or just work with user friendly API for Isolates.
 
-**Learn more in [this](https://maksimka101.github.io/docusaurus-blog/blog/combine/) article!**
+Learn more in [this](https://maksimka101.github.io/docusaurus-blog/blog/combine/) article!
+
+<details>
+  <summary>How it works with Method Channels. Briefly</summary>
+  
+  For the `MethodChannel` combine is using
+  [`BackgroundIsolateBinaryMessenger`](https://medium.com/flutter/introducing-background-isolate-channels-7a299609cad8).
+
+  In the case of the `BinaryMessenger` combine sending its messages to the UI Isolate 
+  and then sends them to the platform. As for now, `BackgroundIsolateBinaryMessenger`
+  can't be used for the `BinaryMessenger`.
+  
+  What's the difference between `MethodChannel` and `BinaryMessenger`?
+  `BinaryMessenger` is a Low-Level API for sending messages to the platform. 
+  For example, it's used by the `AssetBundle` or event by the `MethodChannel` in the main Isolate.
+</details>
 
 # Features
 
@@ -41,6 +56,7 @@ or just work with user friendly API for Isolates.
   - [Close Worker](#close-worker)
 - [Limitations](#limitations)
   - [Method Channel](#method-channel)
+  - [Binary Messenger](#binary-messenger)
   - [Closure variables](#closure-variables)
 
 # Usage
@@ -184,7 +200,8 @@ This code will give the following output:
 
 #### Configuration
 
-Everything is already configured to work with MethodChannels so you can just use them!
+Everything is already configured to work with MethodChannels or 
+BinaryMessengers so you can just use them!
 
 ```dart
 Combine().spawn((context) async {
@@ -196,7 +213,7 @@ Combine().spawn((context) async {
 
 Explanation:
  - the point it that `rootBundle` uses BinaryMessenger (low level MethodChannel)
- - let's assume that file in `assets/test.txt` exists and contains `Asset is loaded!` text
+ - let's assume that the file `assets/test.txt` exists and contains `Asset is loaded!` text
 
 
 ## Combine Worker
@@ -280,22 +297,28 @@ In that case new worker manager will be created.
 
 ### Method Channel
 
-Everything will work fine while `MethodChannel.invokeMethod` 
-or `BinaryMessenger.send` methods are used by you or your plugin.
+As `MethodChannel`s are working using 
+[`BackgroundIsolateBinaryMessenger`](https://medium.com/flutter/introducing-background-isolate-channels-7a299609cad8)
+they have their limitations.
 
-However if `MethodChannel.setMethodCallHandler` or `BinaryMessenger.handlePlatformMessage`
-are used by you or your plugin you may notice that these methods are not working.
+### Binary Messenger
+
+Everything will work fine while `BinaryMessenger.send` method is used by you or your plugin.
+
+However if `BinaryMessenger.handlePlatformMessage`
+is used by you or your plugin you may notice that these methods are not working.
 This may happen if you didn't send any data to the platform from this Isolate. 
 
-Why? In short the reason is that plugin just sends all messages from known [method] channels
-in Main Isolate to the Combine Isolate. However [method] channel becomes known 
+Why? In short the reason is that plugin just sends all messages from known binary messenger
+in Main Isolate to the Combine Isolate. However binary messenger becomes known 
 when you send anything to it.
-The good news is when you want to receive messages from channel using
-`MethodChannel.setMethodCallHandler` or `BinaryMessenger.handlePlatformMessage` methods 
-almost always firstly you send some data to this channel 
+The good news is when you want to receive messages from messenger using
+`BinaryMessenger.handlePlatformMessage` method 
+almost always firstly you send some data to it 
 so it is very unlikely that you will face this problem.
 
 ### Closure variables
+
 Isolate `entryPoint` function for `spawn` method or `task` function for the `execute` methods 
 may be a first-level, as well as a static or top-level.
 

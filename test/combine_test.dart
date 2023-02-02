@@ -1,8 +1,8 @@
+import 'package:combine/src/binary_messenger_middleware/ui_binary_messenger_middleware.dart';
 import 'package:combine/src/isolate_factory/effective_isolate_factory.dart';
 import 'package:combine/src/isolate_factory/native_isolate_factory.dart';
 import 'package:combine/src/isolate_factory/web_isolate_factory.dart';
 import 'package:combine/src/isolate_messenger/internal_isolate_messenger/internal_isolate_messenger.dart';
-import 'package:combine/src/method_channel_middleware/ui_method_channel_middleware.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'combine_spawners/arguments_resend_combine_spawner.dart';
@@ -25,7 +25,10 @@ void main() {
       () async {
         final combineInfo = await checkMethodChannelInIsolateIsInitialized();
 
-        expect(UIMethodChannelMiddleware.instance, isNotNull);
+        expect(
+          UIBinaryMessengerMiddleware.uiBinaryMessengerMiddleware,
+          isNotEmpty,
+        );
         final isolateIsInitialized = await combineInfo.messenger.messages.first;
         expect(isolateIsInitialized, isTrue);
 

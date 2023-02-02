@@ -21,6 +21,7 @@ linter:
     omit_local_variable_types: true
     always_declare_return_types: true
     # Custom disabled rules
+    prefer_asserts_with_message: false
     unnecessary_lambdas: false
     discarded_futures: false
     unnecessary_late: false
