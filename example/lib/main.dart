@@ -1,6 +1,7 @@
 import 'package:combine/combine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
@@ -41,13 +42,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _createCounterIsolate() async {
     final isolate = await Combine().spawn(
-      (context) {
+      (context) async {
+        final sp = await SharedPreferences.getInstance();
         final messenger = context.messenger;
-        var counter = 0;
+        var counter = sp.getInt('counter') ?? 0;
         messenger.messages.listen((event) {
           if (event == "increment") {
             messenger.send(++counter);
+          } else if (event == "decrement") {
+            messenger.send(--counter);
+          } else if (event == "initial") {
+            messenger.send(counter);
           }
+          sp.setInt("counter", counter);
         });
       },
       debugName: "counter",
@@ -55,12 +62,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
     _counterIsolate = isolate;
     setState(() {});
-    isolate.messenger.messages.listen((event) {
-      if (event is int) {
-        _counter = event;
-        setState(() {});
-      }
-    });
+    isolate.messenger
+      ..messages.listen((event) {
+        if (event is int) {
+          _counter = event;
+          setState(() {});
+        }
+      })
+      ..send('initial');
   }
 
   Future<void> _createAssetsIsolate() async {
@@ -73,8 +82,8 @@ class _MyHomePageState extends State<MyHomePage> {
             try {
               final assetString = await rootBundle.loadString(event);
               messenger.send(assetString);
-            } catch (e) {
-              messenger.send("Failed to load asset\nError: $e");
+            } catch (e, st) {
+              messenger.send("Failed to load asset\nError: $e\n$st");
               debugPrint(e.toString());
             }
           }
@@ -104,17 +113,45 @@ class _MyHomePageState extends State<MyHomePage> {
           if (_counterIsolate == null || _assetsIsolate == null)
             const Text("Isolate is creating")
           else ...[
+            const Padding(
+              padding: EdgeInsets.only(left: 16, top: 10),
+              child: Text(
+                'This counter is incremented and decremented in a Isolate and stored in the SharedPreferences.\n'
+                'This example shows how to work with the MethodChannels or packages that use them in a Isolate.',
+              ),
+            ),
             ListTile(
               title: Text("Counter: $_counter"),
-              trailing: IconButton(
-                onPressed: _onIncrementCounter,
-                icon: const Icon(Icons.add),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    onPressed: _onDecrementCounter,
+                    icon: const Icon(Icons.remove),
+                  ),
+                  IconButton(
+                    onPressed: _onIncrementCounter,
+                    icon: const Icon(Icons.add),
+                  ),
+                ],
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.only(left: 16, top: 10),
+              child: Text(
+                'This example shows how to work with the BinaryMessenger or packages that use it in a Isolate.',
               ),
             ),
             ListTile(
               title: const Text("Loaded asset:"),
               subtitle: Text(_loadedAssetString),
               onTap: _onLoadAsset,
+            ),
+            const Padding(
+              padding: EdgeInsets.only(left: 16, top: 10),
+              child: Text(
+                'This example shows how to work the CombineWorker and catch errors in it.',
+              ),
             ),
             ListTile(
               title: const Text("Calculate fibonacci numbers"),
@@ -141,6 +178,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _onIncrementCounter() {
     _counterIsolate?.messenger.send("increment");
+  }
+
+  void _onDecrementCounter() {
+    _counterIsolate?.messenger.send("decrement");
   }
 
   void _onLoadAsset() {
@@ -172,7 +213,7 @@ int calculateFibonacci(int number) {
 }
 
 int _calculateFibonacci(int number) {
-  if (number == 0) {
+  if (number <= 0) {
     return 0;
   } else if (number == 1 || number == 2) {
     return 1;

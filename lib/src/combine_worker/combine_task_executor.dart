@@ -67,9 +67,11 @@ class CombineTaskExecutor {
     try {
       final taskId = _idGenerator();
       _isolateMessenger.send(_ExecutableTaskRequest(taskId, taskInfo.task));
-      final response = await _isolateMessenger.messages.firstWhere(
+      final _ExecutableTaskResponse response = await _isolateMessenger //
+          .messages
+          .firstWhere(
         (msg) => msg is _ExecutableTaskResponse && msg.taskId == taskId,
-      ) as _ExecutableTaskResponse;
+      ) as dynamic;
       response.taskResponse.complete(taskInfo.resultCompleter);
     } catch (error, stackTrace) {
       taskInfo.resultCompleter.completeError(error, stackTrace);

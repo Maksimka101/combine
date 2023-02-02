@@ -21,6 +21,7 @@ linter:
     omit_local_variable_types: true
     always_declare_return_types: true
     # Custom disabled rules
+    unnecessary_lambdas: false
     discarded_futures: false
     unnecessary_late: false
     cast_nullable_to_non_nullable: false
@@ -41,8 +42,6 @@ linter:
     prefer_relative_imports: false
     prefer_mixin: false
     unnecessary_raw_strings: false
-    type_annotate_public_api: false
-    always_use_package_import: false
     prefer_expression_function_bodies: false
     no_default_cases: false
     prefer_single_quotes: false

@@ -17,7 +17,6 @@ class NativeIsolateFactory extends IsolateFactory {
   @override
   Future<CombineInfo> create<T>(
     IsolateEntryPoint<T> entryPoint, {
-    Map<String, Object?>? argumentsMap,
     T? argument,
     String? debugName,
     bool errorsAreFatal = true,
@@ -28,7 +27,7 @@ class NativeIsolateFactory extends IsolateFactory {
       _IsolateSetup<T>(
         receivePort.sendPort,
         entryPoint,
-        argumentsMap,
+        RootIsolateToken.instance!,
         argument,
       ),
       debugName: debugName,
@@ -36,7 +35,7 @@ class NativeIsolateFactory extends IsolateFactory {
     );
 
     final receivePortStream = receivePort.asBroadcastStream().cast<Object?>();
-    final sendPort = await receivePortStream.first as SendPort;
+    final SendPort sendPort = await receivePortStream.first as dynamic;
 
     final isolateMessenger = NativeInternalIsolateMessenger(
       sendPort,
@@ -66,15 +65,17 @@ class NativeIsolateFactory extends IsolateFactory {
       receivePort.asBroadcastStream().cast<Object?>(),
     );
     isolateMessenger.send(receivePort.sendPort);
+    BackgroundIsolateBinaryMessenger.ensureInitialized(setup.isolateToken);
+    IsolatedMethodChannelMiddleware(isolateMessenger).initialize();
+    try {
+      IsolateBinding();
+    } catch (_) {} // Isolate binding should throw exception to skip unnecessary initialization.
 
     final isolateContext = IsolateContext(
       argument: setup.argument,
       messenger: isolateMessenger.toIsolateMessenger(),
       isolate: NativeCombineIsolate(Isolate.current, () {}),
     );
-
-    IsolatedMethodChannelMiddleware(isolateMessenger).initialize();
-    IsolateBinding();
     setup.entryPoint(isolateContext);
   }
 }
@@ -83,13 +84,13 @@ class _IsolateSetup<T> {
   _IsolateSetup(
     this.sendPort,
     this.entryPoint,
-    this.argumentsMap,
+    this.isolateToken,
     this.argument,
   );
 
   final SendPort sendPort;
   final IsolateEntryPoint<T> entryPoint;
-  final Map<String, Object?>? argumentsMap;
+  final RootIsolateToken isolateToken;
   final T? argument;
 }
 

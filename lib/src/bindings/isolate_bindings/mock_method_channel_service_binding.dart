@@ -6,4 +6,9 @@ mixin _MockMethodChannelServiceBinding on ServicesBinding {
     return IsolatedMethodChannelMiddleware.instance!
       ..setBinaryMessage(super.createBinaryMessenger());
   }
+
+  @override
+  RestorationManager createRestorationManager() {
+    return _MockRestorationManager();
+  }
 }

@@ -35,19 +35,14 @@ class IsolatedMethodChannelMiddleware extends BinaryMessenger {
   }
 
   void _listenForMethodChannelEvents(IsolateEvent event) {
-    switch (event.runtimeType) {
-      case PlatformChannelResponseEvent:
-        final responseEvent = event as PlatformChannelResponseEvent;
-        _platformChannelResponse(responseEvent.id, responseEvent.data);
-        break;
-      case InvokeMethodChannelEvent:
-        final invokeEvent = event as InvokeMethodChannelEvent;
-        _handlePlatformMessage(
-          invokeEvent.channel,
-          invokeEvent.id,
-          invokeEvent.data,
-        );
-        break;
+    if (event is PlatformChannelResponseEvent) {
+      _platformChannelResponse(event.id, event.data);
+    } else if (event is InvokeMethodChannelEvent) {
+      _handlePlatformMessage(
+        event.channel,
+        event.id,
+        event.data,
+      );
     }
   }
 

@@ -1,9 +1,14 @@
 import 'package:combine/combine.dart';
+import 'package:combine/src/method_channel_middleware/isolated_method_channel_middleware.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-const _counterMethodChannel = MethodChannel("counter");
+late final _counterMethodChannel = MethodChannel(
+  "counter",
+  const StandardMethodCodec(),
+  ServicesBinding.instance.defaultBinaryMessenger,
+);
 
 Future<CombineInfo> spawnSimpleCounterIsolate() {
   return Combine().spawn((context) {
@@ -24,6 +29,19 @@ Future<CombineInfo> spawnMethodChannelCounterIsolate() {
         await _counterMethodChannel.invokeMethod("increment"),
       );
     });
+  });
+}
+
+Future<CombineInfo> checkMethodChannelInIsolateIsInitialized() {
+  return Combine().spawn((context) {
+    try {
+      // Test will not pass when they are not initialized (are null).
+      IsolatedMethodChannelMiddleware.instance!;
+      BackgroundIsolateBinaryMessenger.instance;
+      context.messenger.send(true);
+    } catch (e) {
+      context.messenger.send(false);
+    }
   });
 }
 

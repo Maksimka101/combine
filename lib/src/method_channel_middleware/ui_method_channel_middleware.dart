@@ -41,15 +41,10 @@ class UIMethodChannelMiddleware {
   }
 
   void _listenForMethodChannelEvents(IsolateEvent event) {
-    switch (event.runtimeType) {
-      case InvokePlatformChannelEvent:
-        final invokeEvent = event as InvokePlatformChannelEvent;
-        _send(invokeEvent.channel, invokeEvent.data, invokeEvent.id);
-        break;
-      case MethodChannelResponseEvent:
-        final responseEvent = event as MethodChannelResponseEvent;
-        _methodChannelResponse(responseEvent.id, responseEvent.data);
-        break;
+    if (event is MethodChannelResponseEvent) {
+      _methodChannelResponse(event.id, event.data);
+    } else if (event is InvokePlatformChannelEvent) {
+      _send(event.channel, event.data, event.id);
     }
   }
 

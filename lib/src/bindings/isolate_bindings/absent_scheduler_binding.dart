@@ -106,4 +106,26 @@ mixin _AbsentSchedulerBinding on BindingBase implements SchedulerBinding {
 
   @override
   int get transientCallbackCount => throw UnimplementedError();
+
+  @override
+  bool debugAssertNoPendingPerformanceModeRequests(String reason) {
+    throw UnimplementedError();
+  }
+
+  @override
+  bool debugAssertNoTimeDilation(String reason) {
+    throw UnimplementedError();
+  }
+
+  @override
+  PerformanceModeRequestHandle? requestPerformanceMode(
+    DartPerformanceMode mode,
+  ) {
+    throw UnimplementedError();
+  }
+
+  @override
+  DartPerformanceMode? debugGetRequestedPerformanceMode() {
+    throw UnimplementedError();
+  }
 }
