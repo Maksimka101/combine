@@ -1,3 +1,6 @@
+## 0.5.1
+- Fix web support by using conditional import.
+
 ## 0.5.0
 - Update `CombineIsolate` to use new Flutters `BackgroundIsolateBinaryMessenger` 
   to work with `MethodChannel`s.
