@@ -19,6 +19,19 @@ Future<CombineInfo> spawnSimpleCounterIsolate() {
   });
 }
 
+Future<CombineInfo> spawnSimpleCounterIsolateInsideAnotherIsolate() {
+  return Combine().spawn((context) async {
+    final isolateInfo = await spawnSimpleCounterIsolate();
+    context.messenger.send(null);
+    context.messenger.messages.listen((msg) {
+      isolateInfo.messenger.send(msg);
+    });
+    isolateInfo.messenger.messages.listen((msg) {
+      context.messenger.send(msg);
+    });
+  });
+}
+
 Future<CombineInfo> spawnMethodChannelCounterIsolate() {
   var counter = 0;
   _counterMethodChannel.setMockMethodCallHandler((call) async => ++counter);

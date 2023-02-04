@@ -69,17 +69,24 @@ class Combine {
   /// // Message from main isolate: Hello from main isolate!
   /// // Message from isolate: Hello from isolate!
   /// ```
+  ///
+  /// [isolateToken] is used to work with [MethodChannel]s in isolate.
+  /// [RootIsolateToken.instance] is used by default if isolate is spawned in UI isolate.
+  /// If Combine isolate is spawned in another Combine isolate, it will inherit [isolateToken].
+  /// So [isolateToken] should be provided only when this method is called from NON UI isolate.
   Future<CombineInfo> spawn<T>(
     IsolateEntryPoint<T> entryPoint, {
     T? argument,
     bool errorsAreFatal = true,
     String? debugName = "combine_isolate",
+    RootIsolateToken? isolateToken,
   }) async {
     return effectiveIsolateFactory.create(
       entryPoint,
       argument: argument,
       errorsAreFatal: errorsAreFatal,
       debugName: debugName,
+      isolateToken: isolateToken ?? RootIsolateToken.instance,
     );
   }
 }
