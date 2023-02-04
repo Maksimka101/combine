@@ -154,4 +154,21 @@ void commonCombineTest() {
     expect(receivedAMessages, [argument, argument]);
     combineInfo.isolate.kill();
   });
+
+  test(
+    timeout: const Timeout(Duration(seconds: 5)),
+    "Combine Isolate created inside another Combine Isolate is working fine",
+    () async {
+      final combineInfo = await spawnSimpleCounterIsolateInsideAnotherIsolate();
+
+      /// Wait when isolate will be initialized.
+      await combineInfo.messenger.messages.first;
+      combineInfo.messenger.send(null);
+      expect(await combineInfo.messenger.messages.first, 1);
+
+      combineInfo.messenger.send(null);
+      expect(await combineInfo.messenger.messages.first, 2);
+      combineInfo.isolate.kill();
+    },
+  );
 }

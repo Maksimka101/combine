@@ -5,6 +5,7 @@ import 'package:combine/src/combine_isolate/web_combine_isolate.dart';
 import 'package:combine/src/isolate_context.dart';
 import 'package:combine/src/isolate_factory/isolate_factory.dart';
 import 'package:combine/src/isolate_messenger/internal_isolate_messenger/web_internal_isolate_messenger.dart';
+import 'package:flutter/services.dart';
 
 class WebIsolateFactory extends IsolateFactory {
   @override
@@ -14,6 +15,7 @@ class WebIsolateFactory extends IsolateFactory {
     T? argument,
     String? debugName,
     bool errorsAreFatal = true,
+    RootIsolateToken? isolateToken,
   }) async {
     // Will be closed by [WebCombineIsolate.kill].
     // ignore: close_sinks

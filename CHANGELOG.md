@@ -1,3 +1,6 @@
+## 0.5.2
+- Fix Isolate spawning from non UI Isolate.
+
 ## 0.5.1
 - Fix web support by using conditional import.
 
