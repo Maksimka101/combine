@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:combine/combine.dart';
+import 'package:combine/src/combine_worker/worker_manager_factory/web_worker_manager_factory.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'utils/test_async_widgets.dart';

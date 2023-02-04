@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:isolate';
 
 import 'package:combine/src/combine_isolate/combine_isolate.dart';
 import 'package:combine/src/combine_singleton.dart';
@@ -186,7 +185,7 @@ class CombineWorkerClosedException implements Exception {
   }
 }
 
-/// This exception is thrown when when you send to/from isolate some unsupported data like [ReceivePort].
+/// This exception is thrown when when you send to/from isolate some unsupported data like `ReceivePort`.
 class UnsupportedIsolateArgumentError extends ArgumentError {
   UnsupportedIsolateArgumentError(this.originalError);
 

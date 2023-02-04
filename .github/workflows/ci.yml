@@ -22,7 +22,7 @@ jobs:
           flutter pub get
           flutter analyze
           flutter pub global activate pana
-          pana --no-warning --exit-code-threshold .
+          pana --no-warning .
 
   test:
     name: flutter test
