@@ -85,7 +85,7 @@ class CombineTaskExecutor {
     if (initializer is WorkerInitializer) {
       await initializer();
     }
-    await for (final request in messenger.messages) {
+    messenger.messages.listen((request) async {
       if (request is _ExecutableTaskRequest) {
         late TaskResponse taskResponse;
         try {
@@ -104,7 +104,7 @@ class CombineTaskExecutor {
           );
         }
       }
-    }
+    });
   }
 }
 

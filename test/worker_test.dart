@@ -9,13 +9,14 @@ import 'utils/test_async_widgets.dart';
 import 'worker_tasks/initializer_tasks.dart';
 import 'worker_tasks/no_args_tasks.dart';
 import 'worker_tasks/one_arg_tasks.dart';
+import 'worker_tasks/parallel_tasks.dart';
 import 'worker_tasks/two_args_tasks.dart';
 
 void main() {
   late CombineWorker combineWorker;
 
   setUp(() {
-    combineWorker = CombineWorkerImpl();
+    combineWorker = CombineWorker.newInstance();
   });
   tearDown(() => combineWorker.close());
 
@@ -143,6 +144,32 @@ void main() {
 
     testAsyncWidgets('test isolate prefix', (_) async {
       await combineWorker.initialize(isolatesPrefix: 'prefix-test');
+    });
+
+    group("Test 'tasksPerIsolate'", () {
+      test("tasks are executed in parallel", () async {
+        await combineWorker.initialize(
+          isolatesCount: 1,
+          tasksPerIsolate: 2,
+        );
+        final updateFlagFuture = combineWorker.execute(setWaitAndRemoveFlag);
+        await Future.delayed(setFlagDelay ~/ 2);
+        final flagValue = await combineWorker.execute(getFlagValue);
+        await updateFlagFuture;
+        expect(flagValue, isTrue);
+      });
+
+      test("tasks are executed in sequence", () async {
+        await combineWorker.initialize(
+          isolatesCount: 1,
+          tasksPerIsolate: 1,
+        );
+        final updateFlagFuture = combineWorker.execute(setWaitAndRemoveFlag);
+        await Future.delayed(setFlagDelay ~/ 2);
+        final flagValue = await combineWorker.execute(getFlagValue);
+        await updateFlagFuture;
+        expect(flagValue, isFalse);
+      });
     });
   });
 

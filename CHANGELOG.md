@@ -1,3 +1,6 @@
+## 0.5.3
+- Fix `CombineWorker` parallel tasks execution.
+
 ## 0.5.2
 - Fix Isolate spawning from non UI Isolate.
 
