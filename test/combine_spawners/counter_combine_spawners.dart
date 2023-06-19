@@ -34,7 +34,11 @@ Future<CombineInfo> spawnSimpleCounterIsolateInsideAnotherIsolate() {
 
 Future<CombineInfo> spawnMethodChannelCounterIsolate() {
   var counter = 0;
-  _counterMethodChannel.setMockMethodCallHandler((call) async => ++counter);
+  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+      .setMockMethodCallHandler(
+    _counterMethodChannel,
+    (call) async => ++counter,
+  );
 
   return Combine().spawn((context) {
     context.messenger.messages.listen((event) async {
@@ -60,8 +64,10 @@ Future<CombineInfo> checkMethodChannelInIsolateIsInitialized() {
 
 Future<CombineInfo> spawnComplexMethodChannelCounterIsolate() {
   var counter = 0;
-  _counterMethodChannel.setMockMethodCallHandler((call) {
-    _counterMethodChannel.binaryMessenger.handlePlatformMessage(
+  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+      .setMockMethodCallHandler(_counterMethodChannel, (call) {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .handlePlatformMessage(
       "counter",
       const StandardMethodCodec().encodeMethodCall(
         MethodCall("counter", ++counter),
