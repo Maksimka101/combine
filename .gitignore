@@ -30,3 +30,5 @@ build/
 
 coverage/web_output/
 coverage
+
+/.fvm/**
