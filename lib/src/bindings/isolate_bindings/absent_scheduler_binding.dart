@@ -128,4 +128,7 @@ mixin _AbsentSchedulerBinding on BindingBase implements SchedulerBinding {
   DartPerformanceMode? debugGetRequestedPerformanceMode() {
     throw UnimplementedError();
   }
+
+  @override
+  void resetLifecycleState() {}
 }

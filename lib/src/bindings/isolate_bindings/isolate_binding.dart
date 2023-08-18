@@ -20,4 +20,5 @@ class IsolateBinding extends BindingBase
   ui.PlatformDispatcher get platformDispatcher {
     throw UnimplementedError();
   }
+
 }

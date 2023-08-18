@@ -1,3 +1,6 @@
+## 0.5.4
+- Upgrade to the flutter 3.13.0.
+
 ## 0.5.3
 - Fix `CombineWorker` parallel tasks execution.
 
