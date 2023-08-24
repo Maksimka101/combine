@@ -14,9 +14,4 @@ class IsolateBinding extends BindingBase
     with
         _AbsentSchedulerBinding,
         ServicesBinding,
-        _MockBinaryMessengerServiceBinding {
-  @override
-  ui.PlatformDispatcher get platformDispatcher {
-    throw UnimplementedError();
-  }
-}
+        _MockBinaryMessengerServiceBinding {}
