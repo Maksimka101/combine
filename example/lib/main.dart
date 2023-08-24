@@ -73,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _createAssetsIsolate() async {
-    final isolate = await Combine().spawn<String>(
+    final isolate = await Combine().spawn(
       (context) {
         final messenger = context.messenger;
 
@@ -170,7 +170,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 title: const Text("Error from calculate fibonacci worker"),
                 subtitle: Text(_calculateFibonacciError.toString()),
               ),
-          ]
+          ],
         ],
       ),
     );

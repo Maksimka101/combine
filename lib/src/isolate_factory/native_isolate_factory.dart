@@ -64,20 +64,20 @@ class NativeIsolateFactory extends IsolateFactory {
   }
 
   static void _runInIsolate<T>(_IsolateSetup<T> setup) {
-    final receivePort = ReceivePort();
-    final isolateMessenger = NativeInternalIsolateMessenger(
-      setup.sendPort,
-      receivePort.asBroadcastStream().cast<Object?>(),
-    );
     final isolateToken = setup.isolateToken;
     if (isolateToken != null) {
       _lastUsedIsolateToken = isolateToken;
       BackgroundIsolateBinaryMessenger.ensureInitialized(isolateToken);
     }
+    final receivePort = ReceivePort();
+    final isolateMessenger = NativeInternalIsolateMessenger(
+      setup.sendPort,
+      receivePort.asBroadcastStream().cast<Object?>(),
+    );
     IsolatedBinaryMessengerMiddleware(isolateMessenger).initialize();
     try {
       IsolateBinding();
-    } catch (_) {} // Isolate binding should throw exception to skip unnecessary initialization.
+    } on IsolateBindingInitializationFinished catch (_) {} // Isolate binding will throw an exception to skip unnecessary initialization.
 
     final isolateContext = IsolateContext(
       argument: setup.argument,

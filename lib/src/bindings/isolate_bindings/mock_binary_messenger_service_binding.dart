@@ -9,6 +9,8 @@ mixin _MockBinaryMessengerServiceBinding on ServicesBinding {
 
   @override
   RestorationManager createRestorationManager() {
-    return _MockRestorationManager();
+    throw IsolateBindingInitializationFinished();
   }
 }
+
+class IsolateBindingInitializationFinished {}
