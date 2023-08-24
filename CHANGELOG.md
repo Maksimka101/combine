@@ -1,3 +1,7 @@
+## 5.5
+
+- Fix the `BackgroundIsolateBinaryMessenger` initialization.
+
 ## 0.5.4
 - Upgrade to the flutter 3.13.0.
 

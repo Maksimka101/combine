@@ -9,7 +9,6 @@ import 'package:flutter/services.dart';
 
 part 'absent_scheduler_binding.dart';
 part 'mock_binary_messenger_service_binding.dart';
-part 'mock_restoration_manager.dart';
 
 class IsolateBinding extends BindingBase
     with
@@ -20,5 +19,4 @@ class IsolateBinding extends BindingBase
   ui.PlatformDispatcher get platformDispatcher {
     throw UnimplementedError();
   }
-
 }
