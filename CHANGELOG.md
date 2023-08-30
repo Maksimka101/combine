@@ -1,3 +1,6 @@
+## 0.5.6
+- Fix the `Combine.spawn` method on web.
+
 ## 0.5.5
 - Fix the `BackgroundIsolateBinaryMessenger` initialization.
 

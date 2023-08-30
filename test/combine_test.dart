@@ -1,12 +1,16 @@
 import 'package:combine/src/binary_messenger_middleware/ui_binary_messenger_middleware.dart';
+import 'package:combine/src/combine_singleton.dart';
 import 'package:combine/src/isolate_factory/effective_isolate_factory.dart';
 import 'package:combine/src/isolate_factory/native_isolate_factory.dart';
 import 'package:combine/src/isolate_factory/web_isolate_factory.dart';
 import 'package:combine/src/isolate_messenger/internal_isolate_messenger/internal_isolate_messenger.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 
 import 'combine_spawners/arguments_resend_combine_spawner.dart';
 import 'combine_spawners/counter_combine_spawners.dart';
+import 'mocks/mock_isolate_factory.dart';
 
 void main() {
   setUpAll(() {
@@ -55,6 +59,52 @@ void main() {
       );
     },
   );
+
+  test(
+    "'Combine.spawn' calls 'effectiveIsolateFactory.create' correctly",
+    () async {
+      final isolateFactory = MockIsolateFactory();
+      registerFallbackValue(FakeRootIsolateToken());
+      setTestIsolateFactory(isolateFactory);
+
+      void entryPoint(_) {}
+      const errorsAreFatal = false;
+      const debugName = 'debugName';
+
+      when(
+        () => isolateFactory.create(
+          entryPoint,
+          argument: debugName,
+          debugName: debugName,
+          errorsAreFatal: errorsAreFatal,
+          isolateToken: any(named: "isolateToken"),
+        ),
+      ).thenAnswer((_) async => FakeCombineInfo());
+
+      await Combine().spawn(
+        entryPoint,
+        errorsAreFatal: errorsAreFatal,
+        debugName: debugName,
+        argument: debugName,
+        // Don't pass isolate token because this test tests isolate token creation.
+        // isolateToken:
+      );
+
+      verify(
+        () => isolateFactory.create(
+          entryPoint,
+          errorsAreFatal: errorsAreFatal,
+          debugName: debugName,
+          argument: debugName,
+          isolateToken: getRootIsolateToken(isWeb: kIsWeb),
+        ),
+      ).called(1);
+    },
+  );
+
+  test("'getRootIsolateToken' returns null on web", () {
+    expect(getRootIsolateToken(isWeb: true), isNull);
+  });
 }
 
 void commonCombineTest() {

@@ -69,7 +69,11 @@ class IsolatedBinaryMessengerMiddleware extends BinaryMessenger {
     ByteData? data,
     ui.PlatformMessageResponseCallback? callback,
   ) async {
-    await _binaryMessenger.handlePlatformMessage(channel, data, callback);
+    ui.channelBuffers.push(channel, data, (data) {
+      if (callback != null) {
+        callback(data);
+      }
+    });
   }
 
   @override
