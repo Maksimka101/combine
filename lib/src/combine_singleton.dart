@@ -4,6 +4,7 @@ import 'package:combine/src/combine_worker_singleton.dart';
 import 'package:combine/src/isolate_factory/effective_isolate_factory.dart';
 import 'package:combine/src/isolate_factory/isolate_factory.dart';
 import 'package:combine/src/isolate_messenger/isolate_messenger.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 /// {@template combine_singleton}
@@ -86,7 +87,7 @@ class Combine {
       argument: argument,
       errorsAreFatal: errorsAreFatal,
       debugName: debugName,
-      isolateToken: isolateToken ?? RootIsolateToken.instance,
+      isolateToken: isolateToken ?? getRootIsolateToken(isWeb: kIsWeb),
     );
   }
 }

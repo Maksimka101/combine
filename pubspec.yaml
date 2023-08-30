@@ -1,7 +1,7 @@
 name: combine
 description: A Flutter package which allows you to work with
   MethodChannels in Isolate and provides simplified Isolate and Thread Pool API.
-version: 0.5.5
+version: 0.5.6
 homepage: https://github.com/Maksimka101/combine
 repository: https://github.com/Maksimka101/combine
 
