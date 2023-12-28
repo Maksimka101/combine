@@ -1,3 +1,6 @@
+## 0.5.7-0.1.pre
+- Update flutter version to the `3.16.5-0.2.pre` and fix build error.
+
 ## 0.5.6
 - Fix the `Combine.spawn` method on web.
 

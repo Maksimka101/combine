@@ -16,7 +16,7 @@ mixin _AbsentSchedulerBinding on BindingBase implements SchedulerBinding {
   void addPersistentFrameCallback(callback) {}
 
   @override
-  void addPostFrameCallback(callback) {}
+  void addPostFrameCallback(callback, {String debugLabel = ''}) {}
 
   @override
   void addTimingsCallback(
