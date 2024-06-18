@@ -131,4 +131,7 @@ mixin _AbsentSchedulerBinding on BindingBase implements SchedulerBinding {
 
   @override
   void resetLifecycleState() {}
+
+  @override
+  void resetInternalState() {}
 }
