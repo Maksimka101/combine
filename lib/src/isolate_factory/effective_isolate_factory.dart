@@ -1,6 +1,6 @@
 import 'package:combine/src/isolate_factory/isolate_factory.dart';
 import 'package:combine/src/isolate_factory/native_isolate_factory.dart'
-    if (dart.library.html) 'package:combine/src/isolate_factory/web_isolate_factory.dart';
+    if (dart.library.js_interop) 'package:combine/src/isolate_factory/web_isolate_factory.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
