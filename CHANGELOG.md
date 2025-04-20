@@ -1,5 +1,5 @@
 ## 0.5.8
-- Add support for the Flutter WASM target
+- Add support for the Flutter WASM target by @EricApostal
 
 ## 0.5.7
 - Update flutter version to the `3.22.2`.
