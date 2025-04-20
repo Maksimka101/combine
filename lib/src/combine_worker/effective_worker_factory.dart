@@ -1,6 +1,6 @@
 import 'package:combine/src/combine_worker/worker_manager_factory/combine_worker_manager_factory.dart';
 import 'package:combine/src/combine_worker/worker_manager_factory/native_worker_manager_factory.dart'
-    if (dart.library.html) 'package:combine/src/combine_worker/worker_manager_factory/web_worker_manager_factory.dart';
+    if (dart.library.js_interop) 'package:combine/src/combine_worker/worker_manager_factory/web_worker_manager_factory.dart';
 import 'package:flutter/foundation.dart';
 
 @visibleForTesting

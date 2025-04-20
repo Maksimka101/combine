@@ -15,7 +15,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   combine:
     path: ../
-  shared_preferences: ^2.0.17
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
