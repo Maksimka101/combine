@@ -84,7 +84,7 @@ mixin _AbsentSchedulerBinding on BindingBase implements SchedulerBinding {
   void scheduleFrame() {}
 
   @override
-  int scheduleFrameCallback(callback, {bool rescheduling = false}) {
+  int scheduleFrameCallback(callback, {bool rescheduling = false, bool scheduleNewFrame = true}) {
     throw UnimplementedError();
   }
 
